@@ -1,0 +1,135 @@
+﻿
+data elements
+
+VsDataManager		VsData			the raw list of fixed Vs information and Vs Theme information
+VsDataManager 		VsDataList 		an array of VsData
+
+VsThemeData			ThemeData		a dictionary of VsThemeInfo objects, indexed by the guid
+
+VsThemeInfo			VsThemeList		a list of VsThemeFile objects
+
+VsThemeFile							base data collection for a single theme file (any theme file)
+	
+
+
+VsThemeInfo
+	...
+	dictionary containing VsThemeFile
+
+
+
+
+
+VsThemeFile
+	public ThemeSource Source { get; private set; }
+	public string FileInfo { get; private set; }
+	public string Style { get; private set; }
+	public string Description { get; private set; }
+	public Theme? Theme { get; set; }
+
+
+
+WorkingThemeFile
+	public string FileInfo { get; private set; }
+	public ThemeSource Source { get; set; }
+	public ThemeStyle Style { get; set; }
+	public ThemeType Type { get; set; }
+	public string Description { get; set; }
+	public Theme? Theme { get; set; }
+
+
+
+process startup
+
+mainwindow
+	=> create viewmodel
+
+mainwinview model
+	=> access (create) theme manager
+	=> access (create) data manager
+	=> create MruManager
+	
+data manager
+	=> access theme manager
+	=> assign vs data (init using [0])
+	=> initAllVsRootThemes
+		=> theme manager => addVsRootTheme => load VsRootThemeData
+
+theme manager
+	=> access data manager
+	=> create theme process
+
+*** at this point ***
+theme manager has a list of all Vs Root Theme info but none of the actual theme data has been read
+need VsId and theme guid to access the actual vs root theme data
+
+
+process selecting theme
+
+theme file types
+
+theme types
+A user theme with a fallback guid
+B user theme without a fallback guid
+C VS root theme A (e.g. Theme.Light.pkgdef)
+D VS root theme B (e.g. Shell.Light.pkgdef)
+E VS builtin theme (e.g. bubblegum.pkgdef)
+	
+theme styles
+
+A light
+B dark
+C high contrast
+
+
+determine theme type
+
+* SelectVsData returns: VsId, ThemeSource, & ThemeStyle
+	* cases for ThemeSource & ThemeStyle
+		* A TSRC_USER + TSTY_TBD
+		* B TSRC_UKN + TSTY_UKN
+		* C TSRC_VS_* + TSTY_ {LIGHT / DARK / HC}
+		* D TSRC_BUILTIN + TSTY_TBD
+		
+* process A
+	* read header & get fallback
+	* exists
+		* with VsId, scan to determine VsThemeInfo 
+			from VsDataList which provides the root theme files (currently 2)
+			which get merged
+	* does not exist
+		* select Light VsThemeInfo to provide the root theme files (currently 2)
+		
+* process B
+	* ignore
+	
+* process C
+	* create a VsThemeInfo file with the other root theme files
+	
+* process D
+	* with VsId, parse the Theme Reg File to determine the fallback
+	* with VsId, scan to determine VsThemeInfo from the VsDataList, etc.
+	
+
+
+
+
+
+basic process
+
+* user selects a theme file (this is the base theme)
+
+* determine theme file type (use UKN when user theme)
+
+* read the theme files fallback guid
+
+* based on the above, determine the style, source, and description
+
+* based on the style and source, determine the fallback theme(s)
+
+* read each fallback theme file (or use the version already read)
+
+* merge the fallback themes into the base theme file to create the working theme
+
+* present the working theme
+

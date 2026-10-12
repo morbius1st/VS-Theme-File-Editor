@@ -1,0 +1,633 @@
+﻿<ResourceDictionary x:Name="CsScrollBarStyle"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:custom="clr-namespace:SharedWPF.ShSupport"
+		xmlns:support="clr-namespace:SharedWPF.ShSupport"
+		xmlns:sys="clr-namespace:System;assembly=mscorlib"
+		>
+
+	<!-- <ResourceDictionary.MergedDictionaries> -->
+	<!-- 	<ResourceDictionary Source="ScrollBarViewColors.xaml" /> -->
+	<!-- </ResourceDictionary.MergedDictionaries> -->
+
+	<support:DivideConverter x:Key="DivideConverter" />
+
+	<sys:Double x:Key="TrackWidth">4</sys:Double>
+	<sys:Double x:Key="RepeatButtonLength">10</sys:Double>
+	<sys:Double x:Key="RepeatButtonIconLength">10</sys:Double>
+	<sys:Double x:Key="RepeatButtonIconGirth">10</sys:Double>
+
+	<Thickness x:Key="IconMarginTop">0, 0, 0, 0</Thickness>
+	<Thickness x:Key="IconMarginBottom">0, 0, 0, 0</Thickness>
+	<Thickness x:Key="IconMarginLeft">0, 0, 0, 0</Thickness>
+	<Thickness x:Key="IconMarginRight">0, 0, 0, 0</Thickness>
+
+
+	<!-- custom properties from CsScrollBarAttached
+
+	example of how to set
+		<Setter Property="custom:CsScrollBarAttached.ScrollBarWidth" Value="15"/>
+
+	ScrollBarWidth - the overall width
+	ScrollBarCornerRadius
+	TrackWidth
+	ThumbCornerRadius
+
+	** border thickness and color - mostly when in a scroll viewer
+	VertBorderThickness
+	VertBorderColor
+
+	HorizBorderThickness
+	HorizBorderColor
+
+	RepeatButtonLength
+	RepeatButtonIconLength
+	RepeatButtonIconGirth
+
+	IconMarginTopEnd
+	IconMarginBottomEnd
+	IconMarginLeftEnd
+	IconMarginRightEnd
+	-->
+
+	<!--
+		┏━━━┓
+		┃ ▲ ┃ <- repeat button (style: ScrollBarButton) + arrow (path top)
+		┣━━━┫ ┓
+		┃   ┃ ┣ <- track + repeat button (style: RepeatButtonTransparent)
+		┃   ┃ ┃
+		┃ █ ┃ <- thumb (style: ScrollBarThumbVertical) & (style: ScrollBarThumbHorizontal)
+		┃   ┃ ┃
+		┃   ┃ ┣ <- track + repeat button (style: RepeatButtonTransparent)
+		┣━━━┫ ┛
+		┃ ▼ ┃ <- repeat button (style: ScrollBarButton) + arrow (path bottom)
+		┗━━━┛
+	-->
+
+
+	<Style x:Key="ScrollBarButton"
+			TargetType="{x:Type RepeatButton}"
+			>
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Focusable" Value="false" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Stretch" />
+		<Setter Property="IsTabStop" Value="false" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type RepeatButton}">
+
+					<Border x:Name="border"
+							BorderThickness="0"
+							SnapsToDevicePixels="true"
+							>
+						<!--  BorderBrush="{DynamicResource ScrollBar.Repeat.Static.Border}"  -->
+						<ContentPresenter x:Name="contentPresenter"
+								Margin="{TemplateBinding Padding}"
+								HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+								Focusable="False"
+								SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+								/>
+					</Border>
+					<ControlTemplate.Triggers>
+						<!-- <Trigger Property="IsMouseOver" Value="true"> -->
+						<!-- 	~1~ <Setter TargetName="border" Property="Background" Value="{DynamicResource ScrollBar.Repeat.MouseOver.Background}" /> @1@ -->
+						<!-- 	<Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource ScrollBar.Repeat.MouseOver.Border}" /> -->
+						<!-- </Trigger> -->
+						<!-- <Trigger Property="IsPressed" Value="true"> -->
+						<!-- 	~1~ <Setter TargetName="border" Property="Background" Value="{DynamicResource ScrollBar.Repeat.Pressed.Background}" /> @1@ -->
+						<!-- 	<Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource ScrollBar.Repeat.Pressed.Border}" /> -->
+						<!-- </Trigger> -->
+						<Trigger Property="IsEnabled" Value="false">
+							<!-- <Setter TargetName="border" Property="Background" Value="{DynamicResource ScrollBar.Repeat.Disabled.Background}" /> -->
+							<!-- <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource ScrollBar.Repeat.Disabled.Border}" /> -->
+							<Setter TargetName="contentPresenter" Property="Opacity" Value="0.56" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+
+	</Style>
+
+	<Style x:Key="RepeatButtonTransparent"
+			TargetType="{x:Type RepeatButton}"
+			>
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="Focusable" Value="false" />
+		<Setter Property="IsTabStop" Value="false" />
+		<Setter Property="OverridesDefaultStyle" Value="true" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type RepeatButton}">
+					<Rectangle
+							Width="{TemplateBinding Width}"
+							Height="{TemplateBinding Height}"
+							Fill="{TemplateBinding Background}"
+							/>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ScrollBarThumbVertical"
+			TargetType="{x:Type Thumb}"
+			>
+		<Setter Property="IsTabStop" Value="false" />
+		<Setter Property="OverridesDefaultStyle" Value="true" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Thumb}">
+
+					<Border x:Name="vertThumb"
+							Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+															Path=(custom:CsScrollBarAp.TrackWidth)}"
+							Height="{TemplateBinding Height}"
+							Background="{DynamicResource ScrollBar.Thumb.Static}"
+							BorderThickness="0"
+							CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.ThumbCornerRadius)}"
+							SnapsToDevicePixels="True"
+							>
+						<!--  BorderBrush="{DynamicResource ScrollBar.Thumb.Static}"  -->
+
+						<!--  <Rectangle x:Name="rectangle"  -->
+						<!--  Width="{Binding RelativeSource={RelativeSource TemplatedParent},  -->
+						<!--  Path=(custom:ScrollBarAttached.TrackWidth)}"  -->
+						<!--  Height="{TemplateBinding Height}"  -->
+						<!--  Fill="{DynamicResource ScrollBar.Thumb.Static}"  -->
+						<!--  SnapsToDevicePixels="True"  -->
+						<!--  />  -->
+					</Border>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="true">
+							<Setter TargetName="vertThumb" Property="Background" Value="{DynamicResource ScrollBar.Thumb.MouseOver}" />
+						</Trigger>
+						<Trigger Property="IsDragging" Value="true">
+							<Setter TargetName="vertThumb" Property="Background" Value="{DynamicResource ScrollBar.Thumb.Pressed}" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="ScrollBarThumbHorizontal"
+			TargetType="{x:Type Thumb}"
+			>
+		<Setter Property="IsTabStop" Value="false" />
+		<Setter Property="OverridesDefaultStyle" Value="true" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type Thumb}">
+
+					<!--  CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},  -->
+					<!--  Path=(custom:ScrollBarAttached.ThumbCornerRadius),  -->
+					<!--  Mode=OneWay}"  -->
+
+					<Border x:Name="horizThumb"
+							Width="{TemplateBinding Width}"
+							Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+															 Path=(custom:CsScrollBarAp.TrackWidth)}"
+							Background="{DynamicResource ScrollBar.Thumb.Static}"
+							BorderThickness="1"
+							BorderBrush="{DynamicResource ScrollBar.Thumb.Static}"
+							CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.ThumbCornerRadius),
+																		 Mode=OneWay}"
+							SnapsToDevicePixels="True"
+							>
+
+					</Border>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="true">
+							<Setter TargetName="horizThumb" Property="Background" Value="{DynamicResource ScrollBar.Thumb.MouseOver}" />
+						</Trigger>
+						<Trigger Property="IsDragging" Value="true">
+							<Setter TargetName="horizThumb" Property="Background" Value="{DynamicResource ScrollBar.Thumb.Pressed}" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<PathGeometry x:Key="Icon.Arrow.Left"
+			Figures="M 2,4 6,6 6,2  z"
+			FillRule="Nonzero"
+			/>
+
+	<PathGeometry x:Key="Icon.Arrow.Right"
+			Figures="M 2,2 6,4 2,6  z"
+			FillRule="Nonzero"
+			/>
+
+	<PathGeometry x:Key="Icon.Arrow.Up"
+			Figures="M 2,6 4,2 6,6 z"
+			FillRule="Nonzero"
+			/>
+
+	<PathGeometry x:Key="Icon.Arrow.Down"
+			Figures="M 2,2 4,6 6,2 z"
+			FillRule="Nonzero"
+			/>
+
+	<Style x:Key="CsScrollBarStyle"
+			TargetType="{x:Type ScrollBar}"
+			>
+		<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+		<Setter Property="Background" Value="{DynamicResource ScrollBar.Static.Background}" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+		<Setter Property="Stylus.IsPressAndHoldEnabled" Value="false" />
+
+		<!--#region > Vertical scroll bar-->
+
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type ScrollBar}">
+					<Border
+							Background="{TemplateBinding Background}"
+							BorderThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				Path=(custom:CsScrollBarAp.VertBorderThickness)}"
+							BorderBrush="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		Path=(custom:CsScrollBarAp.VertBorderColor)}"
+							CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.VerticalCornerRadius)}"
+							>
+
+						<Grid x:Name="Bg"
+								HorizontalAlignment="Stretch"
+								SnapsToDevicePixels="true"
+								>
+							<Grid.RowDefinitions>
+								<RowDefinition MaxHeight="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}}, Path=(custom:CsScrollBarAp.RepeatButtonLength), FallbackValue=18}" />
+								<RowDefinition Height="0.00001*" />
+								<RowDefinition MaxHeight="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}}, Path=(custom:CsScrollBarAp.RepeatButtonLength), FallbackValue=18}" />
+							</Grid.RowDefinitions>
+
+							<!--  <Border  -->
+							<!--  Grid.Row="1"  -->
+							<!--  BorderThickness="{TemplateBinding BorderThickness}"  -->
+							<!--  BorderBrush="{TemplateBinding BorderBrush}"  -->
+							<!--  />  -->
+
+							<RepeatButton x:Name="PART_LineUpButton"
+									Grid.Row="0"
+									Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																	 Path=(custom:CsScrollBarAp.RepeatButtonLength),
+																	 FallbackValue=18}"
+									Command="{x:Static ScrollBar.LineUpCommand}"
+									Style="{DynamicResource ScrollBarButton}"
+									>
+
+								<Path x:Name="ArrowTop"
+										Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.IconMarginTopEnd)}"
+										Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																		FallbackValue=18}"
+										Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.RepeatButtonIconLength),
+																		 FallbackValue=18}"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Top"
+										Data="{StaticResource Icon.Arrow.Up}"
+										Fill="{DynamicResource ScrollBar.Glyph.Static}"
+										Stretch="Fill"
+										/>
+								<!--  Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},  -->
+								<!--  Path=(custom:CsScrollBarAp.RepeatButtonIconLength),  -->
+								<!--  FallbackValue=18}"  -->
+							</RepeatButton>
+
+							<Track x:Name="PART_Track"
+									Grid.Row="1"
+									IsDirectionReversed="true"
+									IsEnabled="{TemplateBinding IsMouseOver}"
+									>
+								<Track.DecreaseRepeatButton>
+									<RepeatButton
+											Command="{x:Static ScrollBar.PageUpCommand}"
+											Style="{DynamicResource RepeatButtonTransparent}"
+											/>
+								</Track.DecreaseRepeatButton>
+								<Track.IncreaseRepeatButton>
+									<RepeatButton
+											Command="{x:Static ScrollBar.PageDownCommand}"
+											Style="{DynamicResource RepeatButtonTransparent}"
+											/>
+								</Track.IncreaseRepeatButton>
+								<Track.Thumb>
+									<Thumb Style="{DynamicResource ScrollBarThumbVertical}" />
+								</Track.Thumb>
+							</Track>
+
+							<RepeatButton x:Name="PART_LineDownButton"
+									Grid.Row="2"
+									Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																	 Path=(custom:CsScrollBarAp.RepeatButtonLength),
+																	 FallbackValue=18}"
+									Command="{x:Static ScrollBar.LineDownCommand}"
+									Style="{DynamicResource ScrollBarButton}"
+									>
+
+								<Path x:Name="ArrowBottom"
+										Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.IconMarginBottomEnd)}"
+										Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																		FallbackValue=18}"
+										Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																		 Path=(custom:CsScrollBarAp.RepeatButtonIconLength),
+																		 FallbackValue=18}"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Bottom"
+										Data="{StaticResource Icon.Arrow.Down}"
+										Fill="{DynamicResource ScrollBar.Glyph.Static}"
+										Stretch="Fill"
+										/>
+
+							</RepeatButton>
+
+						</Grid>
+					</Border>
+
+					<ControlTemplate.Triggers>
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineUpButton}" />
+								<Condition Value="true" Binding="{Binding IsPressed, ElementName=PART_LineUpButton}" />
+							</MultiDataTrigger.Conditions>
+							<Setter TargetName="ArrowTop" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Pressed}" />
+
+							<Setter TargetName="PART_LineUpButton" Property="RenderTransform">
+								<Setter.Value>
+									<ScaleTransform x:Name="B"
+											CenterX="{Binding RelativeSource={RelativeSource Self},
+																				Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																				Mode=OneWay,
+																				Converter={StaticResource DivideConverter},
+																				ConverterParameter=2.0,
+																				FallbackValue=18}"
+											ScaleX="1.5"
+											ScaleY="1.5"
+											/>
+								</Setter.Value>
+							</Setter>
+
+						</MultiDataTrigger>
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineUpButton}" />
+								<Condition Value="false" Binding="{Binding IsPressed, ElementName=PART_LineUpButton}" />
+							</MultiDataTrigger.Conditions>
+							<Setter TargetName="ArrowTop" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.MouseOver}" />
+						</MultiDataTrigger>
+
+
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineDownButton}" />
+								<Condition Value="true" Binding="{Binding IsPressed, ElementName=PART_LineDownButton}" />
+							</MultiDataTrigger.Conditions>
+							<Setter TargetName="ArrowBottom" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Pressed}" />
+							<Setter TargetName="PART_LineDownButton" Property="RenderTransform">
+								<Setter.Value>
+									<ScaleTransform x:Name="C"
+											CenterX="{Binding RelativeSource={RelativeSource Self},
+																				Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																				Mode=OneWay,
+																				Converter={StaticResource DivideConverter},
+																				ConverterParameter=2.0,
+																				FallbackValue=18}"
+											CenterY="{Binding RelativeSource={RelativeSource Self},
+																				Path=(custom:CsScrollBarAp.RepeatButtonIconLength),
+																				FallbackValue=18}"
+											ScaleX="1.5"
+											ScaleY="1.5"
+											/>
+								</Setter.Value>
+							</Setter>
+						</MultiDataTrigger>
+
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineDownButton}" />
+								<Condition Value="false" Binding="{Binding IsPressed, ElementName=PART_LineDownButton}" />
+							</MultiDataTrigger.Conditions>
+							<Setter TargetName="ArrowBottom" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.MouseOver}" />
+						</MultiDataTrigger>
+
+						<Trigger Property="IsEnabled" Value="false">
+							<Setter TargetName="ArrowBottom" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Disabled}" />
+							<Setter TargetName="ArrowTop" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Disabled}" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+
+		<!--#endregion-->
+
+		<!--#region > Horizontal scroll bar-->
+
+		<Style.Triggers>
+			<Trigger Property="Orientation" Value="Horizontal">
+				<Setter Property="BorderThickness" Value="0" />
+				<Setter Property="Stylus.IsFlicksEnabled" Value="false" />
+				<Setter Property="Stylus.IsPressAndHoldEnabled" Value="false" />
+				<Setter Property="Template">
+
+					<Setter.Value>
+						<ControlTemplate TargetType="{x:Type ScrollBar}">
+
+							<Border
+									Background="{TemplateBinding Background}"
+									BorderThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																						Path=(custom:CsScrollBarAp.HorizBorderThickness)}"
+									BorderBrush="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				Path=(custom:CsScrollBarAp.HorizBorderColor)}"
+									CornerRadius="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				 Path=(custom:CsScrollBarAp.HorizontalCornerRadius)}"
+									>
+
+								<Grid x:Name="Bg"
+										VerticalAlignment="Stretch"
+										SnapsToDevicePixels="true"
+										>
+
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition MaxWidth="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}}, Path=(custom:CsScrollBarAp.RepeatButtonLength), FallbackValue=18}" />
+										<ColumnDefinition Width="0.00001*" />
+										<ColumnDefinition MaxWidth="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}}, Path=(custom:CsScrollBarAp.RepeatButtonLength), FallbackValue=18}" />
+									</Grid.ColumnDefinitions>
+
+									<RepeatButton x:Name="PART_LineLeftButton"
+											Grid.Column="0"
+											Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																			Path=(custom:CsScrollBarAp.RepeatButtonLength),
+																			FallbackValue=18}"
+											Command="{x:Static ScrollBar.LineLeftCommand}"
+											Style="{DynamicResource ScrollBarButton}"
+											>
+
+										<Path x:Name="ArrowLeft"
+												Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				 Path=(custom:CsScrollBarAp.IconMarginLeftEnd)}"
+												Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				Path=(custom:CsScrollBarAp.RepeatButtonIconLength),
+																				FallbackValue=18}"
+												Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				 Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																				 FallbackValue=18}"
+												HorizontalAlignment="Left"
+												VerticalAlignment="Center"
+												Data="{StaticResource Icon.Arrow.Left}"
+												Fill="{DynamicResource ScrollBar.Glyph.Static}"
+												Stretch="Fill"
+												/>
+									</RepeatButton>
+
+									<Track x:Name="PART_Track"
+											Grid.Column="1"
+											IsEnabled="{TemplateBinding IsMouseOver}"
+											>
+										<Track.DecreaseRepeatButton>
+											<RepeatButton
+													Command="{x:Static ScrollBar.PageLeftCommand}"
+													Style="{StaticResource RepeatButtonTransparent}"
+													/>
+										</Track.DecreaseRepeatButton>
+										<Track.IncreaseRepeatButton>
+											<RepeatButton
+													Command="{x:Static ScrollBar.PageRightCommand}"
+													Style="{DynamicResource RepeatButtonTransparent}"
+													/>
+										</Track.IncreaseRepeatButton>
+										<Track.Thumb>
+											<Thumb Style="{DynamicResource ScrollBarThumbHorizontal}" />
+										</Track.Thumb>
+									</Track>
+
+									<RepeatButton x:Name="PART_LineRightButton"
+											Grid.Column="2"
+											Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																			Path=(custom:CsScrollBarAp.RepeatButtonLength),
+																			FallbackValue=18}"
+											Command="{x:Static ScrollBar.LineRightCommand}"
+											Style="{DynamicResource ScrollBarButton}"
+											>
+
+										<Path x:Name="ArrowRight"
+												Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				 Path=(custom:CsScrollBarAp.IconMarginRightEnd)}"
+												Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				Path=(custom:CsScrollBarAp.RepeatButtonIconLength),
+																				FallbackValue=18}"
+												Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type ScrollBar}},
+																				 Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																				 FallbackValue=18}"
+												HorizontalAlignment="Right"
+												VerticalAlignment="Center"
+												Data="{StaticResource Icon.Arrow.Right}"
+												Fill="{DynamicResource ScrollBar.Glyph.Static}"
+												Stretch="Fill"
+												/>
+
+									</RepeatButton>
+
+								</Grid>
+
+							</Border>
+
+							<ControlTemplate.Triggers>
+
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineLeftButton}" />
+										<Condition Value="true" Binding="{Binding IsPressed, ElementName=PART_LineLeftButton}" />
+									</MultiDataTrigger.Conditions>
+									<Setter TargetName="ArrowLeft" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Pressed}" />
+									<Setter TargetName="PART_LineLeftButton" Property="RenderTransform">
+										<Setter.Value>
+											<ScaleTransform x:Name="D"
+													CenterY="{Binding RelativeSource={RelativeSource Self},
+																						Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																						Mode=OneWay,
+																						Converter={StaticResource DivideConverter},
+																						ConverterParameter=2.0,
+																						FallbackValue=18}"
+													ScaleX="1.5"
+													ScaleY="1.5"
+													/>
+										</Setter.Value>
+									</Setter>
+								</MultiDataTrigger>
+
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineLeftButton}" />
+										<Condition Value="false" Binding="{Binding IsPressed, ElementName=PART_LineLeftButton}" />
+									</MultiDataTrigger.Conditions>
+									<Setter TargetName="ArrowLeft" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.MouseOver}" />
+								</MultiDataTrigger>
+
+
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineRightButton}" />
+										<Condition Value="true" Binding="{Binding IsPressed, ElementName=PART_LineRightButton}" />
+									</MultiDataTrigger.Conditions>
+									<Setter TargetName="ArrowRight" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Pressed}" />
+									<Setter TargetName="PART_LineRightButton" Property="RenderTransform">
+										<Setter.Value>
+											<ScaleTransform x:Name="A"
+													CenterX="{Binding RelativeSource={RelativeSource Self},
+																						Path=(custom:CsScrollBarAp.RepeatButtonIconLength),
+																						Mode=OneWay,
+																						FallbackValue=18}"
+													CenterY="{Binding RelativeSource={RelativeSource Self},
+																						Path=(custom:CsScrollBarAp.RepeatButtonIconGirth),
+																						Mode=OneWay,
+																						Converter={StaticResource DivideConverter},
+																						ConverterParameter=2.0,
+																						FallbackValue=18}"
+													ScaleX="1.5"
+													ScaleY="1.5"
+													/>
+										</Setter.Value>
+									</Setter>
+								</MultiDataTrigger>
+
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Value="true" Binding="{Binding IsMouseOver, ElementName=PART_LineRightButton}" />
+										<Condition Value="false" Binding="{Binding IsPressed, ElementName=PART_LineRightButton}" />
+									</MultiDataTrigger.Conditions>
+									<Setter TargetName="ArrowRight" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.MouseOver}" />
+								</MultiDataTrigger>
+
+								<Trigger Property="IsEnabled" Value="false">
+									<Setter TargetName="ArrowLeft" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Disabled}" />
+									<Setter TargetName="ArrowRight" Property="Fill" Value="{DynamicResource ScrollBar.Glyph.Disabled}" />
+								</Trigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+
+			</Trigger>
+		</Style.Triggers>
+		<!--#endregion-->
+
+	</Style>
+
+
+
+
+</ResourceDictionary>

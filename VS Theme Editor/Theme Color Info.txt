@@ -1,0 +1,103 @@
+﻿
+
+
+
+
+
+
+data grid
+
+source
+
+		|     |      |        |         |        |         |
+		| src | name | swatch | data    | swatch | data    |
+		|     |      |        |         |        |         |
+
+		         
+		   +-- TCE.ThemeSource
+		   v     +--- TCE.Name
+		         v      +--- TCE.TcForeground.ColorEx.ColorValue
+				        v    +--- TCE.TcForeground.ColorValueString
+						     v  +---TCE.TcForeground.ColorValueDesc
+							     v
+automatic|    |      | \ / | #FFFFFF        |
+(5)		| src | name |  /  | Automatic      | <- TCE.TcForeground.ColorValueToolTip: "Color is automatically determined by Visual Studio"
+		|     |      | / \ |                |
+		                ^--  TCE.TcForeground.ColorSwatchToolTip: "CT_AUTOMATIC (5) - Typically Transparent"
+
+
+
+						     ***
+invalid	|     |      | \ / |                |
+(0)		| src | name |  /  | None           | <- tool tip: *** "CT_INVALID (0) - Is not used"
+		|     |      | / \ |                |
+		                ^-- tool tip: "CT_INVALID (0) - Is not used"
+
+raw  	|     |      |-----|                |
+(1)		| src | name |     | #FFFFFFFF      | <- tool tip: "CT_RAW (1) - Color is { ARGB }"
+		|     |      |_____|                |
+		                ^-- tool tip: "CT_RAW (1) - standard color value"
+
+color  	|     |      | \ / | Color name ... |
+index	| src | name |  /  |                | <- tool tip: "CT_COLORINDEX (2) - Index is (##) - Color is undefined outside of Visual Studio"
+(2)		|     |      | / \ |                |
+		                ^-- tool tip: "CT_COLORINDEX (2) - Color index - member of the enumeration"
+
+syscolor|     |      |-----| Color name ... |
+(3)		| src | name |     |                | <- tool tip: "CT_SYSCOLOR (3) - Index is (##) - Suffix of - N/S notes 'Not Supported'"
+		|     |      |_____|                |
+		                ^-- tool tip: "CT_SYSCOLOR (3) - use GetSysColor Api"
+
+automatic|    |      | \ / | Automatic      |
+(5)		| src | name |  /  | #FFFFFF        | <- tool tip: "CT_AUTOMATIC (5) - Automatically determined by Visual Studio"
+		|     |      | / \ |                |
+		                ^-- tool tip: "CT_AUTOMATIC (5) - Typically Transparent"
+
+
+vs color|     |      | \ / |              |
+(4)		| src | name |  /  | None         | <- tool tip: "CT_VSCOLOR (4) - Color is a member of the __VSSYSCOLOREX enumeration"
+		|     |      | / \ |              |
+		                ^-- tool tip: "CT_VSCOLOR (4) - used with GetVSSysColorEx"
+
+other   |     |      | \ / |              | <- tool tip: "CT_TRACK_FOREGROUND (6) - Do not use"
+(5)/(6) | src | name |  /  | None         | <- tool tip: "CT_TRACK_BACKGROUND (7) - Do not use"
+		|     |      | / \ |              |
+		                ^-- tool tip: "CT_TRACK_FOREGROUND (6) - Do not use"
+		                ^-- tool tip: "CT_TRACK_BACKGROUND (7) - Do not use"
+
+
+
+// properties needed
+// bool GotColor => true, color value is valid, false, color value is invalid
+// string ColorValue => the color value as a string, e.g. #FFFFFFFF or ( not used ) or Index (#)
+// string ColorValueDesc => the color value description, e.g. Color name ... or Automatic or empty
+// string ColorValueToolTip => the color value tool tip, e.g. "Color is not used" or "Color is { ARGB }" or "Color is undefined outside of Visual Studio"
+// string ColorSwatchToolTip => the color swatch tool tip, e.g. "CT_INVALID (0) - Is not used" or "CT_RAW (1) - standard color value" or "CT_COLORINDEX (2) - Color index - member of the enumeration"
+
+
+ {0, "The foreground color for user text" },
+ {1, "Obsolete. Use USERTEXT_BK instead" },
+ {1, "The background color for user text" },
+ {2, "Black" },
+ {2, "The first fixed color. Beginning of fixed color range" },
+ {3, "White" },
+ {4, "Maroon" },
+ {5, "Dark green" },
+ {6, "Brown" },
+ {7, "Dark blue" },
+ {8, "Purple" },
+ {9, "Aquamarine" },
+{10, "Light gray" },
+{11, "Dark gray" },
+{12, "Red" },
+{13, "Green" },
+{14, "Yellow" },
+{15, "Blue" },
+{16, "Magenta" },
+{17, "Cyan" },
+{17, "The last fixed color. End of fixed color range" },
+{18, "The foreground for selected text" },
+{19, "The background for selected text" },
+{20, "The foreground for inactive selection" },
+{21, "The background for inactive selection" },
+

@@ -8,19 +8,77 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Version>1.0.0</Version>
-    <Authors>IridiumIO</Authors>
+    <Authors>CyberStudio</Authors>
     <Company>IridiumIO</Company>
     <Description>Edit Visual Studio 2022 .pkgdef themes.</Description>
     <Copyright>Copyright © 2025</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">  
-    <DebugType>none</DebugType>
+    <DebugType>none</DebugType>  
+    <DefineConstants>$(DefineConstants);USER_SETTINGS</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants);USER_SETTINGS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="obj.z\**" />
+    <Compile Remove="Theme\Data\**" />
+    <Compile Remove="Theme\VsThemes\**" />
+    <EmbeddedResource Remove="obj.z\**" />
+    <EmbeddedResource Remove="Theme\Data\**" />
+    <EmbeddedResource Remove="Theme\VsThemes\**" />
+    <None Remove="obj.z\**" />
+    <None Remove="Theme\Data\**" />
+    <None Remove="Theme\VsThemes\**" />
+    <Page Remove="obj.z\**" />
+    <Page Remove="Theme\Data\**" />
+    <Page Remove="Theme\VsThemes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="EyeDropper.cur" />
+    <None Remove="HotSpot.cur" />
+    <None Remove="Resources\EyeDropperPointer.cur" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\..\UtilityLibrary\Templates\C#\TemplatesProject\WPF\BOD\WpfProject02\SharedWPF\ShSupport\CsScrollBarAp.cs" Link="Windows\Support\CsScrollBarAp.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\Templates\C#\TemplatesProject\WPF\BOD\WpfProject02\SharedWPF\ShSupport\CsScrollViewerAp.cs" Link="Windows\Support\CsScrollViewerAp.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\Templates\C#\TemplatesProject\WPF\BOD\WpfProject02\SharedWPF\ShSupport\ValueConverters.cs" Link="Windows\Support\ValueConverters.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\UtilityLibrary\CsBestMatchCollection.cs" Link="Utilities\CsBestMatchCollection.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\UtilityLibrary\CsFuzzyStringSearch.cs" Link="Utilities\CsFuzzyStringSearch.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\UtilityLibrary\CsStringUtil.cs" Link="Utilities\CsStringUtil.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\UtilityLibrary_Net9\CsExtensionsEx.cs" Link="Utilities\CsExtensionsEx.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\UtilityLibrary_Net9\CsObservableDictionaryEx.cs" Link="Utilities\CsObservableDictionaryEx.cs" />
+    <Compile Include="..\..\..\UtilityLibrary\UtilityLibrary_Net9\CsUtilitiesEx.cs" Link="Utilities\CsUtilitiesEx.cs" />
+  </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="WPF-UI" Version="4.0.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.158" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Resource Include="Resources\EyeDropperPointer.cur" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +94,12 @@
     <None Update="Theme.Dracula.pkgdef">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualStudio.Interop">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.Interop.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

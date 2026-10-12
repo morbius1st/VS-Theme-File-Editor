@@ -1,0 +1,484 @@
+﻿How to Read and Decode the Data Block
+The Data block is a serialized binary stream. To parse it programmatically or manually, you must read the byte array sequentially according to its structural layout:
+Header (First 24 Bytes)
+The block begins with fixed metadata describing the data payload.
+• Bytes 0-3 (4 bytes - Int32): Total Block Size. The total size of the data block in bytes, including the header and all subsequent category and color entries.)
+• Bytes 4–7 (4 bytes - Int32): Header length. Usually 0b 00 00 00 (Version 11).
+• Bytes 8–11 (4 bytes - Int32): Category Count. The number of distinct UI element categories (e.g., Text Editor, Environment) contained in this block.
+• Bytes 12–27 (16 bytes - GUID): Theme Type / Base Theme GUID (e.g., the GUID for VS Dark, Light, or Blue base).
+Category Blocks (Repeated based on Category Count)
+Following the header, each category is packed sequentially:
+• First 16 Bytes (GUID): Category GUID (e.g., Text Editor Category GUID: {7576B244-CC61-11D0-8754-00A0C911E8B2}).
+• Next 4 Bytes (Int32): Color Entry Count. The total number of color definitions packed inside this specific category.
+Color Entries (Repeated based on Color Entry Count)
+Each individual color definition inside a category follows a rigid layout:
+1. Name Length (4 bytes - Int32): The number of characters in the element name.
+2. Name String (Variable length): The name of the UI token (e.g., Background, Keyword), encoded as a UTF-16LE (Unicode) string (2 bytes per character).
+3. Color Data Types & Flags (4 bytes - Int32): Specifies which colors are valid (e.g., 0x01 for Foreground, 0x02 for Background).
+4. Foreground Color (4 bytes - ARGB): The text color, stored in reverse byte order (B, G, R, A). If the foreground isn't utilized by this entry, it defaults to 00 00 00 00.
+5. Background Color (4 bytes - ARGB): The background fill color, stored in reverse byte order (B, G, R, A).
+
+
+
+0 = basic	 x t or f 
+1 = extended x t or f 
+2 = advanced x t or f 
+9 = complete x t or f 
+
+= 4 * 2 = 8 combinations of 0, 1+, 2+, 9 with t or f
+
+
+*********************************
+// == 0 | v = f
+
+<--- cd header --->
+ce's | Category Name
+
+<--- cd info --->
+
+13   | ACDCOverview
+24   | ApacheCordovaToolsColors
+
+<--- ce info --->
+<< none / not included >>
+
+
+*********************************
+// == 0 | v = t
+
+<--- cd header --->
+ce's | Category Name                       [ = ce's | + ce's ]
+
+<--- cd info --->
+
+13   | ACDCOverview                        [ is 13  ]
+24   | ApacheCordovaToolsColors            [ is 24  ]
+
+<--- ce info --->
+<< none / not included >>
+
+
+
+
+
+*********************************
+// == 1+ | v = f
+
+<--- cd header --->
+  ce's | Category Name
+       |     Color Entry Name
+
+<--- cd info --->
+ 13   | ACDCOverview
+ 24   | ApacheCordovaToolsColors
+
+
+******************
+// == 1 | v = f
+
+<--- ce info --->
+      |     Body     
+      |     Chevron  
+
+******************
+// == 2+ | v = f
+
+<--- ce info --->
+      |     Body                                                            | fg| #FFF1F1F1  | bg| #FFFFFFFF
+      |     Chevron                                                         | fg| #FF93667E  | bg| <none>
+
+******************
+// == 9 | v = f
+
+<--- ce info --->
+      |     Body                                                            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+      |     Chevron                                                         | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+
+
+
+
+*********************************
+// == 1+ | v = t				   
+
+<--- cd header --->
+                   ce's | Category Name                       [ = ce's | + ce's ]
+				        |     Color Entry Name
+
+<--- cd info --->
+CyberLight       | 13   | ACDCOverview                        [ is 13  ]
+CyberLight       | 24   | ApacheCordovaToolsColors            [ is 24  ]
+
+
+******************
+// == 1 | v = t
+
+<--- ce info --->
+CyberLight       |     Body      
+CyberLight       |     Chevron   
+
+******************
+// == 2+ | v = t
+
+<--- ce info --->
+CyberLight      |     Body                                                             | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+   ▼            |     Chevron                                                          | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+
+******************
+// == 9 | v = t
+
+<--- ce info --->
+CyberLight      |     Body                                                              [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+CyberLight      |     Chevron                                                           [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+
+
+SUMMARY
+
+<--- 0                                                                                       0 --->|<--- 100                                                                                   100 --->|<--- 200                                                                                   200 --->|
+---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+
+ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ
+
+*********************************
+<--- cd header --->
+===================
+---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+<--- a ----------><--b--><--- c --- ...                       ><-- d ---><-- e -->           (e, f, g, h, i reserve)
+ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍₓₓ.ce'sₓ|ₓCategory Name                      ₓ[ = ce'sₓ+ ce's ]
+
+
+---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+<--- j ----------><--k--><--- l --- ...                       >
+ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍₓₓˍˍˍˍˍₓ|ˍˍˍˍˍColor Entry Name
+
+*********************************
+<--- cd info --->
+===================
+---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+<--- A ----------><--B--><--- C --- ...                       ><-- D -><-- E ->     (E, F, G, H, I reserve)
+CyberLight       | 1    | Autos                                [ = 12ˍₓₓ+ 1ˍˍₓ]
+
+
+
+*********************************
+<--- ce info --->
+===================																													    (N, O, P reserve)                                                    (U, V, W reserve)
+<--- 0                                                                                       0 --->|<--- 100                                                                                   100 --->|<--- 200                                                                                   200 --->|
+---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+<--- J ----------><--K--><--- L --- ...>                                                           ><--- M --- ... >                                 ><--- Q -..------><--- R ---------><--- S ---------><--- T ---------><-- X --- ...>
+    CyberLight          |     Body                                                                 .[ TSRC_USER_WITH_FALLBACK | User Theme           .|.fg|.#FFF1F1F1..[ CT_RAW ]      .|.bg|.#FFFFFFFF..[ CT_RAW ]      .|.fg|.ARGB color                | bg| ARGB color
+
+       ▼                |     Chevron
+
+
+breakdown
+<--- 0                                                                                       0 --->|<--- 100                                                                                   100 --->|<--- 200                                                                                   200 --->|
+---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---|--- 70---|--- 80---|--- 90---|
+123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|123456789|
+<--- J ---------->       <--- L --- ...>                                                           >                                                  <--- Q -..------>                 <--- S --------->                 <-- X --- ...>
+    CyberLight           .....Body                                                                 .                                                  |.fg|.#FFF1F1F1..                 |.bg|.#FFFFFFFF..                 |.fg|.ARGB color                | bg| ARGB color
+       ▼          <--K-->                                                                           <--- M --- ... >                                 >                 <--- R --------->                 <--- T --------->
+                        |                                                                           [ TSRC_USER_WITH_FALLBACK | User Theme           .                 [ CT_RAW ]      .                 [ CT_RAW ]      .
+
+
+
+===================
+f + 0
+b + c
+B + C
+
+~~~~
+f + 1
+b + c
+(k + l)   <= () == added to above
+B + C
+(K + L)
+
+~~~~
+f + 2
+b + c
+K + l
+B + C
+K + L (+ Q + S)
+
+~~~~
+f + 9
+b + c
+k + l
+B + C
+K + L + Q (+ R) + S (+ T)
+
+
+===================
+t + 0
+b + c [+ d]  <= [] == added to f
+B + C [+ D]
+
+~~~~
+t + 1
+[a +] b + c [+ d]
+[j +] k + l
+[A +] B + C [+ D]
+[J +] K + L
+
+~~~~
+t + 2
+[a +] b + c [+ d]
+[j +] k + l
+[A +] B + C [+ D]
+[J +] K + L + Q [+ R] + S [+ T + X]
+
+~~~~
+t + 9
+[a +] b + c [+ d]
+[j +] k + l
+[A +] B + C [+ D]
+[J +] K + L [+ M] + Q + R + S + T [+ X]
+
+*********************************
+<--- cd header --->
+===================
+
+v = f
+ == 0, == 1+
+ce's | Category Name
+
+~~~~~~
+
+== 1+
+     |     Color Entry Name
+
+----------------------
+
+v = t
+== 0
+ce's | Category Name                       [ = ce's | + ce's ] 
+
+~~~~~~
+
+== 1+
+                   ce's | Category Name                       [ = ce's | + ce's ]
+                        |     Color Entry Name
+
+--// | metrics | \\------
+
+// A               // B                                       // C
+<--- 1+ && t -----><--- 0+ --- ... >                          <-- 0+ && t  ... >
+                   .ce's | Category Name                       [ = ce's | + ce's ]
+
+
+<--- 1+ && t -----><--- 1+ --- ... >                          <-- 0+ && t  ... >
+                   ......|     Color Entry Name
+
+
+						
+********************************* 
+<--- cd info --->
+===================
+
+v = f
+ == 0, == 1+
+13   | ACDCOverview
+24   | ApacheCordovaToolsColors
+
+
+----------------------
+
+v = t
+ == 0
+13   | ACDCOverview                        [ is 13  ]
+24   | ApacheCordovaToolsColors            [ is 24  ]
+
+~~~~~~
+
+ == 1+
+CyberLight       | 13   | ACDCOverview                        [ is 13  ]
+CyberLight       | 24   | ApacheCordovaToolsColors            [ is 24  ]
+
+
+--// | metrics | \\------
+
+// A              // B                                        // C
+<--- 1+ & t -----><--- 0+ --- ... >                           <-- t --->
+CyberLight       | 24   | ApacheCordovaToolsColors            [ is 24  ]
+
+
+
+*********************************
+<--- ce info --->
+===================
+
+v = f
+ == 0
+ << none / not included >>
+ 
+ ~~~~~~
+
+ == 1
+      |     Body     
+      |     Chevron 
+
+~~~~~~
+
+ == 2+
+      |     Body                                                            | fg| #FFF1F1F1  | bg| #FFFFFFFF
+      |     Chevron                                                         | fg| #FF93667E  | bg| <none>
+
+~~~~~~
+
+ == 9
+      |     Body                                                            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+      |     Chevron                                                         | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+~~~~~~
+
+ = f
+<--- 1+ --- ...>                                                            <--- 2+ --------><--- 9 ---------><--- 2+ --------><--- 9 --- ... >
+      |     Body                                                            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+
+
+----------------------
+
+v = t
+ == 0
+ << none / not included >>
+
+~~~~~~
+
+ == 1
+CyberLight      |     Body                                                             | fg| #FFF1F1F1  | bg| #FFFFFFFF
+   ▾            |     Hyperlink                                                        | fg| #FF93667E  | bg| <none>
+
+~~~~~~
+
+ == 2+
+CyberLight      |     Body                                                             | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+   ▾            |     Chevron                                                          | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+~~~~~~
+
+ == 9
+CyberLight      |     Body                                                              [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+   ▾            |     Chevron                                                           [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+
+--// | metrics | \\------
+
+ = t
+<--- 1+ --------------- ... >                                                           <--- 9 --- ... >                                  <--- 1+ --------><--- 2+ ---------><--- 1+ --------><--- 2+ --- ... >
+CyberLight      |     Body                                                              [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+
+
+*** final ***
+
+// A             // B                                                                   // C                                              // D             // E             // F             // G             // H
+<--- t & 1+ ----><--- 1+ --- ...>                                                       <--- t & 9 --- ... >                              <- t&1+ / f&2+ -><-- f&9 / t&2+ -><- t&1+ / f&2+ -><-- f&9 / t&2+ -><-- f&9 / t&2+ --- ...>
+CyberLight      |     Body                                                              [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+
+
+
+examples
+
+*********************************
+// == 0 | v = f
+
+ce's | Category Name
+13   | ACDCOverview
+24   | ApacheCordovaToolsColors
+
+...v
+
+
+ *********************************
+// == 0 | v = t
+
+ce's | Category Name                       [ = ce's | + ce's ]
+13   | ACDCOverview                        [ is 13  ]
+24   | ApacheCordovaToolsColors            [ is 24  ]
+
+
+
+*********************************
+// == 1 | v = f
+
+ ce's | Category Name 
+      |     Color Entry Name
+ 13   | ACDCOverview
+      |     Body     
+      |     Chevron  
+ 24   | ApacheCordovaToolsColors
+      |     Body     
+      |     Chevron  
+
+
+*********************************
+// == 2 | v = f
+
+ ce's | Category Name
+      |     Color Entry Name
+ 13   | ACDCOverview
+      |     Body                                                            | fg| #FFF1F1F1  | bg| #FFFFFFFF
+      |     Chevron                                                         | fg| #FF93667E  | bg| <none>
+ 24   | ApacheCordovaToolsColors
+      |     Body                                                            | fg| #FFF1F1F1  | bg| #FFFFFFFF
+      |     Chevron                                                         | fg| #FF93667E  | bg| <none>
+
+
+*********************************
+// == 9 | v = f
+
+ ce's | Category Name
+      |     Color Entry Name
+ 13   | ACDCOverview
+      |     Body                                                            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+      |     Chevron                                                         | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+ 24   | ApacheCordovaToolsColors
+      |     Body                                                            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+      |     Chevron                                                         | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+
+
+*********************************
+// == 1 | v = t
+
+                   ce's | Category Name                       [ = ce's | + ce's ]
+				        |     Color Entry Name
+CyberLight       | 13   | ACDCOverview                        [ is 13  ]
+       CyberLight       |     Body      
+          ▼             |     Chevron   
+CyberLight       | 24   | ApacheCordovaToolsColors            [ is 24  ]
+       CyberLight       |     Body      
+          ▼             |     Chevron   
+
+
+*********************************
+// == 2 | v = t
+
+                   ce's | Category Name                       [ = ce's | + ce's ]
+				        |     Color Entry Name
+CyberLight       | 13   | ACDCOverview                        [ is 13  ]
+    CyberLight          |     Body                                                             | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+       ▼                |     Chevron                                                          | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+CyberLight       | 24   | ApacheCordovaToolsColors            [ is 24  ]
+    CyberLight          |     Body                                                             | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+       ▼                |     Chevron                                                          | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+
+
+*********************************
+// == 9 | v = t
+
+                   ce's | Category Name                       [ = ce's | + ce's ]
+				        |     Color Entry Name
+CyberLight       | 13   | ACDCOverview                        [ is 13  ]
+    CyberLight          |     Body                                                             [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+       ▼                |     Chevron                                                          [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown
+CyberLight       | 24   | ApacheCordovaToolsColors            [ is 24  ]
+    CyberLight          |     Body                                                             [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FFF1F1F1  [ CT_RAW ]       | bg| #FFFFFFFF  [ CT_RAW ]       | fg| ARGB color                | bg| ARGB color
+       ▼                |     Chevron                                                          [ TSRC_USER_WITH_FALLBACK | User Theme            | fg| #FF93667E  [ CT_SYSCOLOR ]  | bg|            [ CT_INVALID ]   | fg| color name: unknown

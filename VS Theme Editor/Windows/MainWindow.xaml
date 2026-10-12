@@ -1,0 +1,1232 @@
+﻿<ui:FluentWindow x:Name="Main"
+		x:Class="VS_Theme_Editor.MainWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:local="clr-namespace:VS_Theme_Editor"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+		xmlns:shsup="clr-namespace:SharedWPF.ShSupport"
+		Title="VS 2022 Theme Editor"
+		Width="1650"
+		Height="1200"
+		mc:Ignorable="d"
+		d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
+		d:Background="Black"
+		ExtendsContentIntoTitleBar="True"
+		WindowBackdropType="Mica"
+		Loaded="FluentWindow_Loaded"
+		Closing="FluentWindow_Closing"
+		>
+		<!-- xmlns:sys="clr-namespace:System;assembly=System.Runtime" -->
+	<!--  ContentRendered="MainWindow_OnContentRendered"  -->
+	<!--  SizeChanged="FluentWindow_SizeChanged"  -->
+
+	<ui:FluentWindow.Resources>
+
+		<local:StringToColorConverter x:Key="StringToColorConverter" />
+		<shsup:PassThroughConverter x:Key="PassThru" />
+
+		<DrawingBrush x:Key="CheckerBrush"
+				TileMode="Tile"
+				Viewport="0,0,10,10"
+				ViewportUnits="Absolute"
+				>
+			<DrawingBrush.Drawing>
+				<DrawingGroup>
+					<!--  Background white square  -->
+					<GeometryDrawing Brush="White">
+						<GeometryDrawing.Geometry>
+							<RectangleGeometry Rect="0,0,10,10" />
+						</GeometryDrawing.Geometry>
+					</GeometryDrawing>
+
+					<!--  Top-left black square  -->
+					<GeometryDrawing Brush="#CCCCCC">
+						<GeometryDrawing.Geometry>
+							<RectangleGeometry Rect="0,0,5,5" />
+						</GeometryDrawing.Geometry>
+					</GeometryDrawing>
+
+					<!--  Bottom-right black square  -->
+					<GeometryDrawing Brush="#CCCCCC">
+						<GeometryDrawing.Geometry>
+							<RectangleGeometry Rect="5,5,5,5" />
+						</GeometryDrawing.Geometry>
+					</GeometryDrawing>
+				</DrawingGroup>
+			</DrawingBrush.Drawing>
+		</DrawingBrush>
+
+	</ui:FluentWindow.Resources>
+
+	<Grid Margin="10,0,10,10">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="300" />
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+
+
+		<ui:Button x:Name="BtnColorChooser"
+				Grid.Row="0"
+				Grid.Column="1"
+				Content="Color Chooser"
+				d:Foreground="White"
+				Command="{Binding ColorChooserCommand}"
+				/>
+
+		<Grid Grid.Row="1" Grid.Column="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+
+			</Grid.RowDefinitions>
+			<Border
+					Width="30"
+					Height="30"
+					BorderThickness="1.5"
+					BorderBrush="White"
+					>
+
+				<Path
+						Margin="-1"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						StrokeThickness="0"
+						Stroke="Transparent"
+						Fill="White"
+						Stretch="Fill"
+						Data="F1 M 10 17.333984 L 1.425781 25.878906 L 0.498047 24.960938 L 9.072266 16.40625 L 0.498047 7.851562 L 1.425781 6.923828 L 10 15.478516 L 18.574219 6.923828 L 19.501953 7.851562 L 10.927734 16.40625 L 19.501953 24.960938 L 18.574219 25.878906 Z "
+						/>
+			</Border>
+
+
+
+			<!--  <Path Width="20"  -->
+			<!--  Height="20"  -->
+			<!--  Stretch="Uniform"  -->
+			<!--  Stroke="White"  -->
+			<!--  StrokeThickness="2"  -->
+			<!--  Fill="White"  -->
+			<!--  Data="M 10,100 C 50,25 150,175 200,100 H 250"/>  -->
+		</Grid>
+
+		<!--  <ui:Button x:Name="BtnTestFind"  -->
+		<!--  Grid.Row="2"  -->
+		<!--  Grid.Column="1"  -->
+		<!--  Content="find"  -->
+		<!--  Margin="0,30,0,0"  -->
+		<!--  Width="90"  -->
+		<!--  VerticalAlignment="Top"  -->
+		<!--  Click="BtnTestFind_OnClick"  -->
+		<!--  />  -->
+
+		<ui:TextBlock
+				Grid.Row="2"
+				Grid.Column="1"
+				Margin="0,60,0,0"
+				Height="30"
+				VerticalAlignment="Top"
+				Text="{Binding ElementName=WorkingThemeCategories,
+											 Path=SelectedItem.Key}"
+				/>
+
+		<!-- removed
+
+		<ui:Button x:Name="BtnMouseTest"
+				Grid.Row="1"
+				Grid.Column="1"
+				Content="MouseTest"
+				d:Foreground="White"
+				Command="{Binding BtnMouseTest_OnClickCommand}"
+				/>
+
+		<StackPanel Grid.Row="2"
+				Grid.Column="1"
+				>
+
+			<ui:TextBlock
+					Height="20"
+				
+					d:Foreground =" White"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Stretch"
+					Text="{Binding MouseCoord, FallbackValue='coord'}"
+					/>
+
+			<ui:TextBlock
+					Height="20"
+					
+					d:Foreground =" White"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Stretch"
+					Text="{Binding MouseMsg, FallbackValue='msg'}"
+					/>
+
+			<Rectangle
+					x:Name="RectMouseTest"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Left"
+					Width="50"
+					Height="50"
+					Fill="{Binding RectFill}"
+					/>
+
+		</StackPanel>
+		-->
+
+
+		<ui:ContentDialogHost x:Name="RootContentDialog"
+				Grid.Row="1"
+				Grid.Column="0"
+				Grid.RowSpan="4"
+				Margin="-10,9,10,-9"
+				Panel.ZIndex="3"
+				/>
+
+		<ui:TitleBar
+				Title="VS Theme File Editor"
+				Grid.Row="0"
+				Grid.Column="0"
+				Margin="0,4,-5,-5"
+				Padding="0"
+				VerticalContentAlignment="Top"
+				Panel.ZIndex="2"
+				FontSize="14"
+				/>
+
+		<Menu
+				Grid.Row="1"
+				Grid.Column="0"
+				Margin="-5,-5,200,5"
+				Padding="0"
+				>
+
+			<MenuItem
+					d:Foreground="White"
+					Command="{Binding SelectThemeCommand}"
+					Header="_Open..."
+					InputGestureText="O"
+					>
+				<MenuItem.Icon>
+					<ui:SymbolIcon Symbol="Document32" />
+				</MenuItem.Icon>
+			</MenuItem>
+
+			<MenuItem
+					d:Foreground="White"
+					Command="{Binding SaveThemeCommand}"
+					Header="_Save"
+					InputGestureText="S"
+					>
+				<MenuItem.Icon>
+					<ui:SymbolIcon Symbol="Save16" />
+				</MenuItem.Icon>
+			</MenuItem>
+			<MenuItem
+					d:Foreground="White"
+					Command="{Binding SaveAsThemeCommand}"
+					Header="S_ave As..."
+					InputGestureText="A"
+					>
+				<MenuItem.Icon>
+					<ui:SymbolIcon Symbol="SaveMultiple16" />
+				</MenuItem.Icon>
+			</MenuItem>
+			<Separator />
+
+			<MenuItem
+					d:Foreground="White"
+					Command="{Binding TestThemeCommand}"
+					Header="_Test in Visual Studio..."
+					InputGestureText="T"
+					>
+				<MenuItem.Icon>
+					<ui:SymbolIcon Symbol="Run16" />
+				</MenuItem.Icon>
+			</MenuItem>
+
+			<Separator />
+
+			<MenuItem
+					IsEnabled="{Binding GotWorkingTheme,
+															Mode=OneWay}"
+					d:Foreground="White"
+					Command="{Binding ThemeReportCommand}"
+					Header="Theme _Report"
+					InputGestureText="R"
+					>
+				<MenuItem.Icon>
+					<ui:SymbolIcon Symbol="DocumentOnePage24" />
+				</MenuItem.Icon>
+			</MenuItem>
+			<Separator />
+
+			<MenuItem
+					d:Foreground="White"
+					Command="{Binding TestCommand}"
+					Header="Test"
+					InputGestureText="E"
+					>
+				<MenuItem.Icon>
+					<ui:SymbolIcon Symbol="LauncherSettings20" />
+				</MenuItem.Icon>
+			</MenuItem>
+
+		</Menu>
+
+		<ui:Button x:Name="BtnThemeSwitch"
+				Grid.Row="1"
+				Grid.Column="0"
+				Margin="0,0,10,0"
+				Width="26"
+				Height="26"
+				Padding="0"
+				HorizontalAlignment="Right"
+				FontSize="24"
+				BorderBrush="DimGray"
+				Click="BtnThemeSwitch_OnClick"
+				>
+			<ui:Button.Style>
+				<Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type Button}}">
+					<Setter Property="Content" Value="{ui:SymbolIcon Symbol='WeatherSunny16', Filled='True'}" />
+					<Setter Property="ToolTip" Value="Switch Theme to Light" />
+					<Style.Triggers>
+						<DataTrigger Value="false" Binding="{Binding ElementName=Main, Path=ThemeIsDark}">
+							<Setter Property="Content" Value="{ui:SymbolIcon Symbol='WeatherMoon20', Filled='True'}" />
+							<Setter Property="ToolTip" Value="Switch Theme to Dark" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ui:Button.Style>
+		</ui:Button>
+
+		<ui:Card Grid.Row="2" Grid.Column="0">
+
+			<Grid VerticalAlignment="Stretch">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
+					<ColumnDefinition Width="330" />
+					<ColumnDefinition Width="20" />
+					<ColumnDefinition Width="100" />
+					<ColumnDefinition Width="*" />
+
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="24" />
+					<RowDefinition Height="110" />
+
+				</Grid.RowDefinitions>
+
+				<Label
+						Grid.Row="0"
+						Grid.Column="0"
+						Content="Recent Files"
+						/>
+
+				<DockPanel
+						Grid.Row="1"
+						Grid.Column="0"
+						Grid.ColumnSpan="2"
+						>
+
+					<Label Content="No Recent Files" Foreground="Gray">
+						<Label.Style>
+							<Style TargetType="Label">
+								<Setter Property="Visibility" Value="Collapsed" />
+								<Style.Triggers>
+									<DataTrigger Value="True" Binding="{Binding MruMgr.FilesView.IsEmpty}">
+										<Setter Property="Visibility" Value="Visible" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</Label.Style>
+					</Label>
+
+					<ui:ListView x:Name="MruFiles"
+							Margin="10,0,0,0"
+							d:ItemsSource="{d:SampleData}"
+							SelectedItem="{Binding MruFile,
+																		 Mode=TwoWay}"
+							VirtualizingPanel.ScrollUnit="Pixel"
+							SelectionMode="Single"
+							ItemsSource="{Binding MruMgr.FilesView,
+																		Mode=OneWay}"
+							>
+						<ui:ListView.Style>
+							<!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
+							<Style TargetType="ui:ListView" BasedOn="{StaticResource {x:Type ui:ListView}}">
+								<Setter Property="Visibility" Value="Visible" />
+								<Style.Triggers>
+									<DataTrigger Value="True" Binding="{Binding MruMgr.FilesView.IsEmpty}">
+										<Setter Property="Visibility" Value="Collapsed" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ui:ListView.Style>
+
+						<ui:ListView.ItemTemplate>
+							<DataTemplate DataType="{x:Type local:MostRecentlyUsed}">
+								<DockPanel>
+
+									<ui:TextBlock
+											Margin="0,0,15,0"
+											Width="200"
+											DockPanel.Dock="Left"
+											Text="{Binding Path=ThemeName,
+																		 FallbackValue='Theme Name'}"
+											ToolTip="{Binding Path=FolderPath,
+																				FallbackValue='Folder Path'}"
+											/>
+
+									<ui:TextBlock
+											DockPanel.Dock="Left"
+											Text="{Binding Path=FileName,
+																		 FallbackValue='File Name.ext'}"
+											ToolTip="{Binding Path=FolderPath,
+																				FallbackValue='Folder Path'}"
+											/>
+									<!--  StringFormat='&#x3E;{0}&#x3C;',  -->
+
+
+								</DockPanel>
+							</DataTemplate>
+						</ui:ListView.ItemTemplate>
+
+					</ui:ListView>
+
+				</DockPanel>
+
+				<Label
+						Grid.Row="0"
+						Grid.Column="3"
+						Content="Recent Folders"
+						/>
+
+				<ui:ListView x:Name="MruFolders"
+						Grid.Row="1"
+						Grid.Column="3"
+						Grid.ColumnSpan="2"
+						Margin="10,0,0,0"
+						d:ItemsSource="{d:SampleData}"
+						SelectedItem="{Binding MruFolder,
+																	 Mode=TwoWay}"
+						VirtualizingPanel.ScrollUnit="Pixel"
+						ItemsSource="{Binding MruMgr.FoldersView,
+																	Mode=OneWay}"
+						>
+					<ui:ListView.ItemTemplate>
+						<DataTemplate DataType="{x:Type local:MostRecentlyUsed}">
+							<ui:TextBlock Text="{Binding Path=FolderPath, FallbackValue='Folder Path'}" />
+						</DataTemplate>
+					</ui:ListView.ItemTemplate>
+
+				</ui:ListView>
+
+			</Grid>
+
+		</ui:Card>
+
+		<ui:Card
+				Grid.Row="3"
+				Grid.Column="0"
+				BorderThickness="0,1,0,0"
+				BorderBrush="White"
+				>
+
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="430" />
+					<ColumnDefinition Width="20" />
+					<ColumnDefinition Width="450" />
+					<ColumnDefinition Width="20" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+
+				</Grid.RowDefinitions>
+
+				<Label
+						Grid.Row="0"
+						Grid.Column="0"
+						Content="Theme Details"
+						VerticalAlignment="Center"
+						/>
+
+				<!--  name  -->
+				<StackPanel
+						Grid.Row="1"
+						Grid.Column="0"
+						Orientation="Horizontal"
+						>
+					<TextBlock
+							Width="100"
+							VerticalAlignment="Center"
+							Text="Theme Name "
+							/>
+
+					<ui:TextBox
+							Margin="5,5"
+							Width="320"
+							Text="{Binding WorkingTheme.Name,
+														 Mode=TwoWay,
+														 UpdateSourceTrigger=LostFocus}"
+							/>
+
+				</StackPanel>
+
+				<!--  guid  -->
+				<StackPanel
+						Grid.Row="2"
+						Grid.Column="0"
+						Orientation="Horizontal"
+						>
+
+					<TextBlock
+							Width="100"
+							VerticalAlignment="Center"
+							Text="Guid "
+							/>
+
+					<ui:TextBox
+							Margin="5,5"
+							Width="320"
+							IsReadOnly="True"
+							Text="{Binding WorkingTheme.Guid}"
+							/>
+
+					<Button
+							Margin="-40,2,0,0"
+							Width="36"
+							Height="36"
+							Padding="0"
+							Background="Transparent"
+							BorderBrush="Transparent"
+							Command="{Binding RegenerateGuidCommand}"
+							>
+						<ui:SymbolIcon FontSize="16" Symbol="ArrowRotateClockwise24" />
+						<Button.ToolTip>
+							<ToolTip>
+								<TextBlock Text="Regenerate Guid" />
+							</ToolTip>
+						</Button.ToolTip>
+					</Button>
+
+				</StackPanel>
+
+				<!--  slug  -->
+				<DockPanel
+						Grid.Row="1"
+						Grid.Column="2"
+						Margin="0,0,0,0"
+						>
+					<TextBlock
+							Width="100"
+							VerticalAlignment="Center"
+							Text="Theme Slug "
+							/>
+					<ui:TextBox
+							Margin="5,5"
+							DockPanel.Dock="Top"
+							Text="{Binding WorkingTheme.Slug,
+														 Mode=TwoWay,
+														 UpdateSourceTrigger=LostFocus}"
+							/>
+				</DockPanel>
+
+				<!--  fallback guid  -->
+				<DockPanel
+						Grid.Row="2"
+						Grid.Column="2"
+						Margin="0,0,0,0"
+						>
+					<TextBlock
+							Width="100"
+							VerticalAlignment="Center"
+							Text="Fallback Guid "
+							/>
+					<ui:TextBox
+							Margin="5,5"
+							DockPanel.Dock="Top"
+							Text="{Binding WorkingTheme.Fallback,
+														 Mode=TwoWay,
+														 UpdateSourceTrigger=LostFocus}"
+							/>
+				</DockPanel>
+
+				<DockPanel
+						Grid.Row="1"
+						Grid.Column="4"
+						Margin="0,0,10,0"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Center"
+						>
+					<ui:TextBlock
+							Margin="0,0,10,0"
+							Width="100"
+							HorizontalAlignment="Left"
+							Text="Categories"
+							/>
+
+					<ui:TextBlock HorizontalAlignment="Left" Text="{Binding WorkingTheme.OriginalCategoryCount, FallbackValue='100'}" />
+
+				</DockPanel>
+
+				<!--  VS version  -->
+				<StackPanel
+						Grid.Row="0"
+						Grid.Column="4"
+						Margin="0,0,10,8"
+						HorizontalAlignment="Left"
+						VerticalAlignment="Bottom"
+						Orientation="Horizontal"
+						>
+					<TextBlock
+							Margin="0,0,0,0"
+							Width="100"
+							Padding="0,6,0,9"
+							VerticalAlignment="Center"
+							TextAlignment="Left"
+							Text="VS Version"
+							/>
+
+					<Border
+							Margin="0,6,-20,6"
+							Width="5"
+							Background="{Binding VisualStudioDescBdr,
+																	 FallbackValue='blue'}"
+							CornerRadius="3"
+							/>
+
+					<ui:TextBox
+							Width="230"
+							Padding="18,7,5,8"
+							HorizontalAlignment="Stretch"
+							VerticalAlignment="Stretch"
+							Text="{Binding VisualStudioDesc,
+														 FallbackValue='Visual Studio 2022 Community',
+														 Mode=OneWay}"
+							>
+
+
+					</ui:TextBox>
+				</StackPanel>
+
+				<StackPanel
+						Grid.Row="2"
+						Grid.Column="4"
+						HorizontalAlignment="Left"
+						Orientation="Horizontal"
+						>
+
+					<CheckBox
+							Content="Extend Theme Info"
+							Margin="-5,0,0,0"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Center"
+							IsChecked="{Binding ExtendThemeInfo,
+																	Mode=TwoWay,
+																	FallbackValue=False}"
+							/>
+				</StackPanel>
+
+
+			</Grid>
+
+		</ui:Card>
+
+		<ui:Card
+				Grid.Row="4"
+				Grid.Column="0"
+				VerticalAlignment="Stretch"
+				VerticalContentAlignment="Stretch"
+				>
+
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="430" MinWidth="425" />
+					<ColumnDefinition Width="20" />
+					<ColumnDefinition Width="450" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition />
+				</Grid.RowDefinitions>
+
+				<DockPanel
+						Grid.Row="0"
+						Grid.Column="0"
+						Margin="0,0,0,10"
+						HorizontalAlignment="Stretch"
+						>
+
+					<DockPanel.Style>
+						<Style TargetType="DockPanel">
+							<Setter Property="IsEnabled" Value="true" />
+							<Style.Triggers>
+								<DataTrigger Value="0" Binding="{Binding WorkingTheme.Categories.Count}">
+									<Setter Property="IsEnabled" Value="False" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</DockPanel.Style>
+
+					<DockPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top">
+
+						<Label
+								Content="Search"
+								Margin="0,0,0,0"
+								Width="100"
+								HorizontalAlignment="Left"
+								VerticalAlignment="Center"
+								d:Foreground="White"
+								/>
+
+						<ui:TextBox
+								Margin="5,5"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Center"
+								Text="{Binding CategorySearch,
+															 UpdateSourceTrigger=PropertyChanged}"
+								PlaceholderText="Find Category"
+								PlaceholderEnabled="{Binding RelativeSource={RelativeSource Self},
+																						 Path=IsEnabled}"
+								/>
+					</DockPanel>
+
+					<Label
+							Content="Category found"
+							Margin="0,5,0,0"
+							Width="100"
+							FontSize="11"
+							Foreground="DimGray"
+							DockPanel.Dock="left"
+							/>
+
+					<ui:TextBlock
+							Margin="0,5,5,0"
+							FontSize="11"
+							Foreground="DimGray"
+							Text="{Binding FoundCatName,
+														 Mode=OneWay,
+														 FallbackValue='found'}"
+							DockPanel.Dock="Bottom"
+							/>
+
+				</DockPanel>
+
+				<DockPanel
+						Grid.Row="0"
+						Grid.Column="2"
+						Margin="0,0,0,0"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Top"
+						>
+
+					<DockPanel.Style>
+						<Style TargetType="DockPanel">
+							<Setter Property="IsEnabled" Value="true" />
+							<Style.Triggers>
+								<DataTrigger Value="0" Binding="{Binding WorkingTheme.Categories.Count}">
+									<Setter Property="IsEnabled" Value="False" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</DockPanel.Style>
+
+					<Label
+							Content="Search"
+							Margin="0,5,0,5"
+							Width="100"
+							Padding="0,0,35,0"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Center"
+							HorizontalContentAlignment="Right"
+							d:Foreground="White"
+							/>
+
+					<ui:TextBox
+							Margin="5,5"
+							HorizontalAlignment="Stretch"
+							VerticalAlignment="Center"
+							Text="{Binding ColorFilter,
+														 UpdateSourceTrigger=PropertyChanged}"
+							PlaceholderText="Search Colors"
+							PlaceholderEnabled="{Binding RelativeSource={RelativeSource Self},
+																					 Path=IsEnabled}"
+							/>
+
+
+				</DockPanel>
+
+				<ui:ListView x:Name="WorkingThemeCategories"
+						Grid.Row="1"
+						Grid.Column="0"
+						Margin="5,0"
+						VerticalAlignment="Stretch"
+						IsSynchronizedWithCurrentItem="True"
+						d:ItemsSource="{d:SampleData}"
+						SelectedItem="{Binding SelectedCategoryKvp,
+																	 Mode=TwoWay}"
+						VirtualizingPanel.ScrollUnit="Item"
+						SelectedValuePath="Key"
+						ItemsSource="{Binding WorkingTheme.CategoriesView}"
+						>
+					<!--  VirtualizingPanel.ScrollUnit="Pixel"  -->
+
+					<ui:ListView.ItemTemplate>
+						<DataTemplate>
+
+							<StackPanel Orientation="Horizontal">
+
+								<ui:TextBlock
+										Margin="5"
+										Width="24"
+										HorizontalAlignment="Right"
+										Text="{Binding Value.Entries.Count}"
+										TextAlignment="Right"
+										/>
+
+								<ui:TextBlock x:Name="lvName"
+										Margin="20,5,5,5"
+										Text="{Binding Value.Name}"
+										/>
+							</StackPanel>
+
+						</DataTemplate>
+					</ui:ListView.ItemTemplate>
+					<ui:ListView.ContextMenu>
+						<ContextMenu>
+							<MenuItem x:Name="MnuAddNewCategory"
+									Header="_Add New Category"
+									InputGestureText="A"
+									Click="btn_AddCategory_clicked"
+									>
+								<MenuItem.Icon>
+									<ui:SymbolIcon Symbol="Add12" />
+								</MenuItem.Icon>
+							</MenuItem>
+							<!--  Command="{Binding AddCategoryCommand}"  -->
+							<!--  CommandParameter="{Binding Path=CurrentCategory.Name}"  -->
+							<Separator />
+
+							<MenuItem
+									Foreground="#d70000"
+									Command="{Binding DeleteCategoryCommand}"
+									CommandParameter="{Binding Path=CurrentCategory}"
+									Header="Delete Category"
+									InputGestureText="Del"
+									>
+								<!--  CommandParameter="{Binding PlacementTarget,  -->
+								<!--  RelativeSource={RelativeSource AncestorType=ContextMenu}}"  -->
+
+								<MenuItem.Icon>
+									<ui:SymbolIcon Foreground="#d70000" Symbol="Delete12" />
+								</MenuItem.Icon>
+							</MenuItem>
+						</ContextMenu>
+					</ui:ListView.ContextMenu>
+				</ui:ListView>
+
+				<GridSplitter
+						Grid.Row="1"
+						Grid.Column="0"
+						Width="3"
+						Background="#20FFFFFF"
+						/>
+
+				<ui:DataGrid x:Name="DgEntries"
+						Grid.Row="1"
+						Grid.Column="2"
+						Grid.ColumnSpan="2"
+						VerticalAlignment="Stretch"
+						d:ItemsSource="{d:SampleData}"
+						AutoGenerateColumns="False"
+						CanUserAddRows="True"
+						CanUserDeleteRows="True"
+						VirtualizingPanel.ScrollUnit="Item"
+						ItemsSource="{Binding CurrentCategory.FilteredEntriesView}"
+						>
+
+					<ui:DataGrid.RowStyle>
+						<Style TargetType="DataGridRow">
+							<Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+							<Setter Property="Height" Value="48" />
+						</Style>
+					</ui:DataGrid.RowStyle>
+
+
+					<ui:DataGrid.Columns>
+
+						<DataGridTemplateColumn x:Name="DgColSource"
+								Width="100"
+								Header="Source"
+								>
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate DataType="{x:Type local:ThemeColorEntry}">
+									<StackPanel Width="100" Orientation="Horizontal">
+										<ui:TextBlock
+												Margin="0,0,0,0"
+												Width="80"
+												FontSize="12"
+												Text="{Binding SourceFileName}"
+												/>
+
+									</StackPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+
+							<DataGridTemplateColumn.CellStyle>
+								<Style TargetType="DataGridCell">
+									<Setter Property="VerticalAlignment" Value="Center" />
+								</Style>
+							</DataGridTemplateColumn.CellStyle>
+
+						</DataGridTemplateColumn>
+
+						<DataGridTemplateColumn x:Name="DgColName"
+								Width="340"
+								Header="Name"
+								>
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate DataType="{x:Type local:ThemeColorEntry}">
+									<StackPanel>
+										<ui:TextBox x:Name="TbxCeName"
+												Margin="0,0,10,5"
+												FontSize="16"
+												Text="{Binding Name}"
+												ToolTip="{Binding Name}"
+												/>
+									</StackPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+
+						</DataGridTemplateColumn>
+
+						<!--  Background Preview  -->
+						<DataGridTemplateColumn x:Name="DgColBackground"
+								Width="200"
+								Header="Background"
+								>
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate DataType="{x:Type local:ThemeColorEntry}">
+									<DockPanel x:Name="SpBgColorPanel"
+											 Margin="0,0,15,5">
+
+										<ui:Button
+												Margin="5,0"
+												Height="40"
+												Padding="0"
+												HorizontalAlignment="Stretch"
+												HorizontalContentAlignment="Stretch"
+												d:Foreground="White"
+												ToolTip="{Binding TcBackground.ColorValueToolTip}"
+												>
+											<ui:Button.Content>
+
+												<DockPanel x:Name="SpBgBtnContent"
+														HorizontalAlignment="Stretch"
+														VerticalAlignment="Center"
+														>
+
+													<Grid x:Name="GrdBgSwatches"
+															Margin="10,0,0,0"
+															ToolTip="{Binding TcBackground.ColorSwatchToolTip}"
+															>
+														<Rectangle
+																Width="28"
+																Height="28"
+																Fill="{StaticResource CheckerBrush}"
+																Stroke="Black"
+																StrokeThickness="0.5"
+																/>
+														<Rectangle
+																Width="28"
+																Height="28"
+																Stroke="Black"
+																StrokeThickness="0.5"
+																Fill="{Binding TcBackground.ColorEx.ToSolidColorBrush}"
+																>
+														</Rectangle>
+														<Grid.Style>
+															<Style TargetType="Grid">
+																<Setter Property="Visibility" Value="Visible" />
+																<Style.Triggers>
+																	<DataTrigger Value="false" Binding="{Binding TcBackground.GotColor, FallbackValue='true'}">
+																		<Setter Property="Visibility" Value="Collapsed" />
+																	</DataTrigger>
+																</Style.Triggers>
+															</Style>
+														</Grid.Style>
+
+													</Grid>
+
+													<Border x:Name="BdrBgSwatchInvalid"
+															Margin="10,0,0,0"
+															Width="28"
+															Height="28"
+															BorderThickness="1.5"
+															BorderBrush="{DynamicResource TextFillColorDisabledBrush}"
+															d:BorderBrush="Gray"
+															ToolTip="{Binding TcBackground.ColorSwatchToolTip}"
+															>
+
+														<Path
+																Margin="-1"
+																HorizontalAlignment="Center"
+																VerticalAlignment="Center"
+																d:Fill="Gray"
+																StrokeThickness="0"
+																Stroke="Transparent"
+																Fill="{DynamicResource TextFillColorDisabledBrush}"
+																Stretch="Fill"
+																Data="F1 M 10 17.333984 L 1.425781 25.878906 L 0.498047 24.960938 L 9.072266 16.40625 L 0.498047 7.851562 L 1.425781 6.923828 L 10 15.478516 L 18.574219 6.923828 L 19.501953 7.851562 L 10.927734 16.40625 L 19.501953 24.960938 L 18.574219 25.878906 Z "
+																/>
+
+														<Border.Style>
+															<Style TargetType="Border">
+																<Setter Property="Visibility" Value="Collapsed" />
+																<Style.Triggers>
+																	<DataTrigger Value="false" Binding="{Binding TcBackground.GotColor, FallbackValue='true'}">
+																		<Setter Property="Visibility" Value="Visible" />
+																	</DataTrigger>
+																</Style.Triggers>
+															</Style>
+														</Border.Style>
+
+													</Border>
+
+													<DockPanel x:Name="DpBgInfo"
+															Margin="10,0,10,0"
+															HorizontalAlignment="Stretch"
+															VerticalAlignment="Center"
+															>
+
+														<ui:TextBlock
+																Margin="0,0,0,0"
+																FontSize="14"
+																HorizontalAlignment="Stretch"
+																TextAlignment="Center"
+																DockPanel.Dock="Top"
+																Text="{Binding TcBackground.ColorValueString,
+																							 FallbackValue='#FFFFFFFF'}"
+																/>
+
+														<ui:TextBlock
+																Margin="0,3,0,0"
+																FontSize="10"
+																HorizontalAlignment="Stretch"
+																TextAlignment="Center"
+																Text="{Binding TcBackground.ColorValueDesc,
+																							 FallbackValue='#FFFFFFFF'}"
+																>
+															<ui:TextBlock.Style>
+																<Style TargetType="ui:TextBlock">
+																	<Setter Property="Visibility" Value="Visible" />
+																	<Style.Triggers>
+																		<DataTrigger Value="" Binding="{Binding TcBackground.ColorValueDesc}">
+																			<Setter Property="Visibility" Value="Collapsed" />
+																		</DataTrigger>
+																		<DataTrigger Value="{x:Null}" Binding="{Binding TcBackground.ColorValueDesc}">
+																			<Setter Property="Visibility" Value="Collapsed" />
+																		</DataTrigger>
+																	</Style.Triggers>
+																</Style>
+															</ui:TextBlock.Style>
+														</ui:TextBlock>
+													</DockPanel>
+
+												</DockPanel>
+
+											</ui:Button.Content>
+
+										</ui:Button>
+
+									</DockPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<!--<DataGridTextColumn Binding="{Binding ForegroundType}" Header="Foreground Type" />-->
+						<!--  Foreground Preview  -->
+						<DataGridTemplateColumn x:Name="DgColForeground"
+								Width="200"
+								Header="Foreground"
+								>
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate DataType="{x:Type local:ThemeColorEntry}">
+									<DockPanel x:Name="SpFgColorPanel" Margin="0,0,15,5">
+
+										<ui:Button
+												Margin="5,0"
+												Height="40"
+												Padding="0"
+												HorizontalAlignment="Stretch"
+												HorizontalContentAlignment="Stretch"
+												d:Foreground="White"
+												ToolTip="{Binding TcForeground.ColorValueToolTip}"
+												>
+											<ui:Button.Content>
+
+												<DockPanel x:Name="DpFgBtnContent"
+														HorizontalAlignment="Stretch"
+														VerticalAlignment="Center"
+														>
+
+													<Grid x:Name="GrdFgSwatches"
+															Margin="10,0,0,0"
+															ToolTip="{Binding TcForeground.ColorSwatchToolTip}"
+															>
+														<Rectangle
+																Width="28"
+																Height="28"
+																Fill="{StaticResource CheckerBrush}"
+																Stroke="Black"
+																StrokeThickness="0.5"
+																/>
+														<Rectangle
+																Width="28"
+																Height="28"
+																Stroke="Black"
+																StrokeThickness="0.5"
+																Fill="{Binding TcForeground.ColorEx.ToSolidColorBrush}"
+																>
+														</Rectangle>
+
+														<Grid.Style>
+															<Style TargetType="Grid">
+																<Setter Property="Visibility" Value="Visible" />
+																<Style.Triggers>
+																	<DataTrigger Value="false" Binding="{Binding TcForeground.GotColor, FallbackValue='true'}">
+																		<Setter Property="Visibility" Value="Collapsed" />
+																	</DataTrigger>
+																</Style.Triggers>
+															</Style>
+														</Grid.Style>
+
+													</Grid>
+
+													<Border x:Name="BdrFgSwatchInvalid"
+															Margin="10,0,0,0"
+															Width="28"
+															Height="28"
+															BorderThickness="1.5"
+															BorderBrush="{DynamicResource TextFillColorDisabledBrush}"
+															d:BorderBrush="Gray"
+															ToolTip="{Binding TcForeground.ColorSwatchToolTip}"
+															>
+
+														<Path
+																Margin="-1"
+																HorizontalAlignment="Center"
+																VerticalAlignment="Center"
+																d:Fill="Gray"
+																StrokeThickness="0"
+																Stroke="Transparent"
+																Fill="{DynamicResource TextFillColorDisabledBrush}"
+																Stretch="Fill"
+																Data="F1 M 10 17.333984 L 1.425781 25.878906 L 0.498047 24.960938 L 9.072266 16.40625 L 0.498047 7.851562 L 1.425781 6.923828 L 10 15.478516 L 18.574219 6.923828 L 19.501953 7.851562 L 10.927734 16.40625 L 19.501953 24.960938 L 18.574219 25.878906 Z "
+																/>
+
+														<Border.Style>
+															<Style TargetType="Border">
+																<Setter Property="Visibility" Value="Collapsed" />
+																<Style.Triggers>
+																	<DataTrigger Value="false" Binding="{Binding TcForeground.GotColor, FallbackValue='true'}">
+																		<Setter Property="Visibility" Value="Visible" />
+																	</DataTrigger>
+																</Style.Triggers>
+															</Style>
+														</Border.Style>
+
+													</Border>
+
+													<DockPanel x:Name="DpFgInfo"
+															Margin="10,0,10,0"
+															HorizontalAlignment="Stretch"
+															VerticalAlignment="Center"
+															>
+
+														<ui:TextBlock
+																Margin="0,0,0,0"
+																HorizontalAlignment="Stretch"
+																FontSize="14"
+																DockPanel.Dock="Top"
+																Text="{Binding TcForeground.ColorValueString,
+																							 FallbackValue='#FFFFFFFF'}"
+																TextAlignment="Center"
+																/>
+
+														<ui:TextBlock
+																Margin="0,3,0,0"
+																HorizontalAlignment="Stretch"
+																FontSize="10"
+																Text="{Binding TcForeground.ColorValueDesc,
+																							 FallbackValue='#FFFFFFFF'}"
+																TextAlignment="Center"
+																>
+															<ui:TextBlock.Style>
+																<Style TargetType="ui:TextBlock">
+																	<Setter Property="Visibility" Value="Visible" />
+																	<Style.Triggers>
+																		<DataTrigger Value="" Binding="{Binding TcForeground.ColorValueDesc}">
+																			<Setter Property="Visibility" Value="Collapsed" />
+																		</DataTrigger>
+																		<DataTrigger Value="{x:Null}" Binding="{Binding TcForeground.ColorValueDesc}">
+																			<Setter Property="Visibility" Value="Collapsed" />
+																		</DataTrigger>
+
+																	</Style.Triggers>
+																</Style>
+															</ui:TextBlock.Style>
+														</ui:TextBlock>
+
+													</DockPanel>
+
+												</DockPanel>
+											</ui:Button.Content>
+
+										</ui:Button>
+
+									</DockPanel>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+
+					</ui:DataGrid.Columns>
+				</ui:DataGrid>
+
+			</Grid>
+
+		</ui:Card>
+
+		<ui:SnackbarPresenter x:Name="RootSnackbar"
+				Grid.Row="1"
+				Grid.Column="0"
+				Grid.RowSpan="4"
+				MaxWidth="600"
+				/>
+
+	</Grid>
+
+
+</ui:FluentWindow>

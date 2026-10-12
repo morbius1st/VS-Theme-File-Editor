@@ -1,0 +1,2431 @@
+﻿<ui:FluentWindow Name="WinColorChooser"
+		x:Class="VS_Theme_Editor.ColorChooser"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+		xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+		xmlns:local="clr-namespace:VS_Theme_Editor"
+		Title="Color Chooser"
+		Width="665"
+		Height="515"
+		mc:Ignorable="d"
+		d:DataContext="{d:DesignInstance local:ColorChooserViewModel}"
+		d:Background="Black"
+		ExtendsContentIntoTitleBar="True"
+		WindowBackdropType="Mica"
+		ResizeMode="NoResize"
+		ContentRendered="ColorChooser_OnContentRendered"
+		Closed="ColorChooser_Closed"
+		Loaded="ColorChooser_OnLoaded"
+		Closing="ColorChooser_OnClosing"
+		>
+
+	<ui:FluentWindow.Resources>
+
+		<GridLength x:Key="GlUpArrow">16</GridLength>
+		<GridLength x:Key="GlTbxCvDec">20</GridLength>
+		<GridLength x:Key="GlDnArrow">16</GridLength>
+
+		<local:DoubleToIntegerConverter x:Key="DblToIntConverter" />
+		<local:ColorComponentsToColor x:Key="ColorComponentsToColor" />
+
+
+		<Path x:Key="IconEyeDropper2"
+				x:Shared="False"
+				d:Fill="White"
+				Data="F1 M 19.980469 3.115234 C 19.980469 3.531902 19.900715 3.932293 19.741211 4.316406 C 19.581705 4.700521 19.355469 5.039062 19.0625 5.332031 L 17.021484 7.373047 L 17.060547 7.421875 C 17.242838 7.623699 17.379557 7.827149 17.470703 8.032227 C 17.561848 8.237305 17.607422 8.476562 17.607422 8.75 C 17.607422 8.997396 17.560221 9.236654 17.46582 9.467773 C 17.371418 9.698894 17.236328 9.902344 17.060547 10.078125 L 15.703125 11.435547 C 15.527343 11.604818 15.323893 11.738281 15.092773 11.835938 C 14.861653 11.933594 14.622396 11.982422 14.375 11.982422 C 14.147135 11.982422 13.924152 11.941732 13.706055 11.860352 C 13.487955 11.778972 13.294271 11.660156 13.125 11.503906 L 7.509766 17.119141 C 7.353516 17.275391 7.184245 17.4056 7.001953 17.509766 C 6.819661 17.613932 6.629231 17.700195 6.430664 17.768555 C 6.232096 17.836914 6.028646 17.890625 5.820312 17.929688 C 5.611979 17.96875 5.400391 18.004557 5.185547 18.037109 C 4.912109 18.076172 4.635417 18.147787 4.355469 18.251953 C 4.075521 18.356119 3.798828 18.476562 3.525391 18.613281 C 3.251953 18.75 2.985026 18.896484 2.724609 19.052734 C 2.464193 19.208984 2.216797 19.358725 1.982422 19.501953 C 1.878255 19.567057 1.782227 19.614258 1.694336 19.643555 C 1.606445 19.672852 1.500651 19.6875 1.376953 19.6875 C 1.233724 19.6875 1.098633 19.65983 0.97168 19.604492 C 0.844727 19.549154 0.734049 19.474283 0.639648 19.379883 C 0.545247 19.285482 0.470378 19.174805 0.415039 19.047852 C 0.359701 18.920898 0.332031 18.785807 0.332031 18.642578 C 0.332031 18.525391 0.34668 18.419596 0.375977 18.325195 C 0.405273 18.230795 0.452474 18.13151 0.517578 18.027344 C 0.667318 17.786459 0.820312 17.537436 0.976562 17.280273 C 1.132812 17.023113 1.277669 16.759441 1.411133 16.489258 C 1.544596 16.219076 1.661784 15.945639 1.762695 15.668945 C 1.863607 15.392253 1.933594 15.107422 1.972656 14.814453 C 1.998698 14.599609 2.032877 14.388021 2.075195 14.179688 C 2.117513 13.971354 2.171224 13.767904 2.236328 13.569336 C 2.301432 13.370769 2.386068 13.180339 2.490234 12.998047 C 2.594401 12.815756 2.724609 12.646484 2.880859 12.490234 L 8.496094 6.875 C 8.333333 6.69922 8.212891 6.505535 8.134766 6.293945 C 8.056641 6.082357 8.017578 5.859375 8.017578 5.625 C 8.017578 5.377604 8.064778 5.138347 8.15918 4.907227 C 8.25358 4.676107 8.388672 4.472657 8.564453 4.296875 L 9.921875 2.939453 C 10.097656 2.763672 10.301106 2.628582 10.532227 2.53418 C 10.763346 2.439779 11.002604 2.392578 11.25 2.392578 C 11.783854 2.392578 12.233072 2.581381 12.597656 2.958984 L 14.648438 0.908203 C 14.941405 0.615234 15.278319 0.388998 15.65918 0.229492 C 16.040039 0.069988 16.438801 -0.009766 16.855469 -0.009766 C 17.285156 -0.009766 17.688801 0.073242 18.066406 0.239258 C 18.44401 0.405273 18.774414 0.629883 19.057617 0.913086 C 19.34082 1.196289 19.56543 1.526693 19.731445 1.904297 C 19.897461 2.281902 19.980469 2.685547 19.980469 3.115234 Z M 18.730469 3.115234 C 18.730469 2.854818 18.681641 2.610678 18.583984 2.382812 C 18.486328 2.154949 18.352863 1.958008 18.183594 1.791992 C 18.014322 1.625977 17.815754 1.494141 17.587891 1.396484 C 17.360025 1.298828 17.115885 1.25 16.855469 1.25 C 16.608072 1.25 16.368814 1.297201 16.137695 1.391602 C 15.906574 1.486004 15.703124 1.621094 15.527344 1.796875 L 13.486328 3.837891 L 16.132812 6.494141 L 18.183594 4.443359 C 18.359375 4.267579 18.494465 4.064129 18.588867 3.833008 C 18.683268 3.601889 18.730469 3.362631 18.730469 3.115234 Z M 16.357422 8.75 C 16.357422 8.580729 16.295572 8.434245 16.171875 8.310547 L 11.689453 3.828125 C 11.565755 3.704428 11.419271 3.642578 11.25 3.642578 C 11.080729 3.642578 10.934244 3.704428 10.810547 3.828125 L 9.453125 5.185547 C 9.329427 5.309245 9.267578 5.455729 9.267578 5.625 C 9.267578 5.794271 9.329427 5.940756 9.453125 6.064453 L 13.564453 10.185547 C 13.623046 10.244141 13.68164 10.304362 13.740234 10.366211 C 13.798827 10.428061 13.860676 10.486654 13.925781 10.541992 C 13.990885 10.597331 14.059244 10.642904 14.130859 10.678711 C 14.202473 10.714519 14.283854 10.732422 14.375 10.732422 C 14.544271 10.732422 14.690755 10.670573 14.814453 10.546875 L 16.171875 9.189453 C 16.295572 9.065756 16.357422 8.919271 16.357422 8.75 Z M 12.246094 10.625 L 9.375 7.753906 L 3.759766 13.369141 C 3.655599 13.473308 3.572591 13.588867 3.510742 13.71582 C 3.448893 13.842773 3.398438 13.976237 3.359375 14.116211 C 3.320312 14.256186 3.291016 14.399414 3.271484 14.545898 C 3.251953 14.692383 3.232422 14.833984 3.212891 14.970703 C 3.141276 15.517578 2.986653 16.048178 2.749023 16.5625 C 2.511393 17.076822 2.255859 17.568359 1.982422 18.037109 C 2.457682 17.757162 2.944336 17.501627 3.442383 17.270508 C 3.940429 17.039389 4.466146 16.881512 5.019531 16.796875 C 5.143229 16.777344 5.279948 16.754557 5.429688 16.728516 C 5.579427 16.702475 5.727539 16.669922 5.874023 16.630859 C 6.020507 16.591797 6.158854 16.541342 6.289062 16.479492 C 6.419271 16.417643 6.533203 16.337891 6.630859 16.240234 Z "
+				Fill="White"
+				Stretch="Uniform"
+				/>
+
+
+
+		<Path x:Key="IconChevronUp1"
+				Height="6"
+				x:Shared="False"
+				d:Fill="White"
+				Data="F1 M 3.330078 12.5 C 3.330078 12.272136 3.411458 12.076823 3.574219 11.914062 L 9.414062 6.074219 C 9.576822 5.911459 9.772135 5.830078 10 5.830078 C 10.227864 5.830078 10.423177 5.911459 10.585938 6.074219 L 16.425781 11.914062 C 16.588541 12.076823 16.669922 12.272136 16.669922 12.5 C 16.669922 12.734375 16.586914 12.931315 16.420898 13.09082 C 16.254883 13.250326 16.057941 13.330078 15.830078 13.330078 C 15.602213 13.330078 15.4069 13.248698 15.244141 13.085938 L 10 7.841797 L 4.755859 13.085938 C 4.593099 13.248698 4.397786 13.330078 4.169922 13.330078 C 3.942057 13.330078 3.745117 13.250326 3.579102 13.09082 C 3.413086 12.931315 3.330078 12.734375 3.330078 12.5 Z "
+				Fill="White"
+				Stretch="Uniform"
+				/>
+
+		<Path x:Key="IconChevronDn1"
+				Height="6"
+				x:Shared="False"
+				d:Fill="White"
+				Data="F1 M 3.330078 7.5 C 3.330078 7.382812 3.352865 7.273764 3.398438 7.172852 C 3.44401 7.071941 3.504232 6.984051 3.579102 6.90918 C 3.653971 6.834311 3.741862 6.774089 3.842773 6.728516 C 3.943685 6.682943 4.052734 6.660156 4.169922 6.660156 C 4.29362 6.660156 4.401042 6.681315 4.492188 6.723633 C 4.583333 6.765951 4.671224 6.829428 4.755859 6.914062 L 10 12.158203 L 15.244141 6.914062 C 15.41341 6.744792 15.608723 6.660156 15.830078 6.660156 C 15.947266 6.660156 16.056314 6.682943 16.157227 6.728516 C 16.258137 6.774089 16.346027 6.834311 16.420898 6.90918 C 16.495768 6.984051 16.555988 7.071941 16.601562 7.172852 C 16.647135 7.273764 16.669922 7.382812 16.669922 7.5 C 16.669922 7.727865 16.588541 7.923178 16.425781 8.085938 L 10.585938 13.925781 C 10.423177 14.088542 10.227864 14.169922 10 14.169922 C 9.772135 14.169922 9.576822 14.088542 9.414062 13.925781 L 3.574219 8.085938 C 3.411458 7.923178 3.330078 7.727865 3.330078 7.5 Z "
+				Fill="White"
+				Stretch="Uniform"
+				/>
+
+		<DrawingBrush x:Key="CheckerBrush"
+				TileMode="Tile"
+				Viewport="0,0,10,10"
+				ViewportUnits="Absolute"
+				>
+			<DrawingBrush.Drawing>
+				<DrawingGroup>
+					<!--  Background white square  -->
+					<GeometryDrawing Brush="White">
+						<GeometryDrawing.Geometry>
+							<RectangleGeometry Rect="0,0,10,10" />
+						</GeometryDrawing.Geometry>
+					</GeometryDrawing>
+
+					<!--  Top-left black square  -->
+					<GeometryDrawing Brush="#CCCCCC">
+						<GeometryDrawing.Geometry>
+							<RectangleGeometry Rect="0,0,5,5" />
+						</GeometryDrawing.Geometry>
+					</GeometryDrawing>
+
+					<!--  Bottom-right black square  -->
+					<GeometryDrawing Brush="#CCCCCC">
+						<GeometryDrawing.Geometry>
+							<RectangleGeometry Rect="5,5,5,5" />
+						</GeometryDrawing.Geometry>
+					</GeometryDrawing>
+				</DrawingGroup>
+			</DrawingBrush.Drawing>
+		</DrawingBrush>
+
+		<GradientStopCollection x:Key="BrushHueRangeRedToRed">
+			<GradientStop Offset="0.02" Color="#ff0000" />
+			<GradientStop Offset="0.055" Color="#ff7000" />
+
+			<!--  .12  -->
+			<GradientStop Offset=".112" Color="#ffcc00" />
+			<!--  .047  -->
+			<GradientStop Offset=".167" Color="#ffff00" />
+			<!--  .083  -->
+			<GradientStop Offset=".222" Color="#ccff00" />
+
+			<!--  .03  -->
+			<GradientStop Offset=".278" Color="#70ff00" />
+			<!--  .053  -->
+			<GradientStop Offset=".333" Color="#00ff00" />
+			<!--  .067  -->
+			<GradientStop Offset=".388" Color="#00ff70" />
+
+			<!--  .06  -->
+			<GradientStop Offset=".445" Color="#00ffcc" />
+			<!--  .04  -->
+			<GradientStop Offset=".50" Color="#00ffff" />
+			<!--  .06  -->
+			<GradientStop Offset=".555" Color="#00ccff" />
+
+			<!--  .6  -->
+			<GradientStop Offset=".611" Color="#0070ff" />
+			<!--  .046  -->
+			<GradientStop Offset=".666" Color="#0000ff" />
+			<!--  .34  -->
+			<GradientStop Offset=".721" Color="#7000ff" />
+
+			<!--  .1  -->
+			<GradientStop Offset=".778" Color="#cc00ff" />
+			<!--  .033  -->
+			<GradientStop Offset=".833" Color="#ff00ff" />
+			<!--  .067  -->
+			<GradientStop Offset=".888" Color="#ff00cc" />
+			<!--  1  -->
+			<GradientStop Offset=".945" Color="#ff0070" />
+
+			<GradientStop Offset=".98" Color="#ff0000" />
+		</GradientStopCollection>
+
+		<!--  full color range - horizontal orientation  -->
+		<LinearGradientBrush x:Key="BrushColorPalette" StartPoint="0,0" EndPoint="1,0" GradientStops="{StaticResource BrushHueRangeRedToRed}">
+
+			<!-- <GradientStop Offset="0.02" Color="#ff0000" /> -->
+			<!-- <GradientStop Offset="0.055" Color="#ff7000" /> -->
+			<!--    -->
+			<!--  ~1~  .12  @1@  -->
+			<!-- <GradientStop Offset=".112" Color="#ffcc00" /> -->
+			<!--  ~1~  .047  @1@  -->
+			<!-- <GradientStop Offset=".167" Color="#ffff00" /> -->
+			<!--  ~1~  .083  @1@  -->
+			<!-- <GradientStop Offset=".222" Color="#ccff00" /> -->
+			<!--    -->
+			<!--  ~1~  .03  @1@  -->
+			<!-- <GradientStop Offset=".278" Color="#70ff00" /> -->
+			<!--  ~1~  .053  @1@  -->
+			<!-- <GradientStop Offset=".333" Color="#00ff00" /> -->
+			<!--  ~1~  .067  @1@  -->
+			<!-- <GradientStop Offset=".388" Color="#00ff70" /> -->
+			<!--    -->
+			<!--  ~1~  .06  @1@  -->
+			<!-- <GradientStop Offset=".445" Color="#00ffcc" /> -->
+			<!--  ~1~  .04  @1@  -->
+			<!-- <GradientStop Offset=".50" Color="#00ffff" /> -->
+			<!--  ~1~  .06  @1@  -->
+			<!-- <GradientStop Offset=".555" Color="#00ccff" /> -->
+			<!--    -->
+			<!--  ~1~  .6  @1@  -->
+			<!-- <GradientStop Offset=".611" Color="#0070ff" /> -->
+			<!--  ~1~  .046  @1@  -->
+			<!-- <GradientStop Offset=".666" Color="#0000ff" /> -->
+			<!--  ~1~  .34  @1@  -->
+			<!-- <GradientStop Offset=".721" Color="#7000ff" /> -->
+			<!--    -->
+			<!--  ~1~  .1  @1@  -->
+			<!-- <GradientStop Offset=".778" Color="#cc00ff" /> -->
+			<!--  ~1~  .033  @1@  -->
+			<!-- <GradientStop Offset=".833" Color="#ff00ff" /> -->
+			<!--  ~1~  .067  @1@  -->
+			<!-- <GradientStop Offset=".888" Color="#ff00cc" /> -->
+			<!--  ~1~  1  @1@  -->
+			<!-- <GradientStop Offset=".945" Color="#ff0070" /> -->
+			<!--    -->
+			<!-- <GradientStop Offset=".98" Color="#ff0000" /> -->
+
+		</LinearGradientBrush>
+
+		<LinearGradientBrush x:Key="BrushGraySelect" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Offset="0.05" Color="#ffffff" />
+			<GradientStop Offset="0.95" Color="#FF000000" />
+		</LinearGradientBrush>
+
+		<LinearGradientBrush x:Key="BrushHueSelectVertical" StartPoint="0,1" EndPoint="0,0" GradientStops="{StaticResource BrushHueRangeRedToRed}">
+		</LinearGradientBrush>
+
+		<LinearGradientBrush x:Key="BrushAlphaSelect" StartPoint="0,1" EndPoint="0,0">
+			<GradientStop Offset="0.05" Color="#00ffffff" />
+			<GradientStop Offset="0.95" Color="#ffffffff" />
+		</LinearGradientBrush>
+
+		<LinearGradientBrush x:Key="BrushWhiteOverlay" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Offset="0.05" Color="#FFffffff" />
+			<GradientStop Offset=".95" Color="#00000000" />
+		</LinearGradientBrush>
+
+		<LinearGradientBrush x:Key="BrushBlackOverlay" StartPoint="0,0" EndPoint="0,1">
+			<GradientStop Offset="0.08" Color="#00000000" />
+			<GradientStop Offset=".98" Color="#FF000000" />
+		</LinearGradientBrush>
+
+		<!--  <Style x:Key="TbxColorId"  -->
+		<!--  TargetType="TextBlock"  -->
+		<!--  BasedOn="{StaticResource {x:Type TextBlock}}"  -->
+		<!--  >  -->
+		<!-- 	<Setter Property="Margin" Value="0,0,10,0" /> -->
+		<!-- 	<Setter Property="Padding" Value="0" /> -->
+		<!-- 	<Setter Property="VerticalAlignment" Value="Center" /> -->
+		<!-- 	<Setter Property="Width" Value="24" /> -->
+		<!-- 	<Setter Property="TextAlignment" Value="Right" /> -->
+		<!-- </Style> -->
+
+		<Style x:Key="TbxColorValue"
+				TargetType="TextBox"
+				BasedOn="{StaticResource {x:Type TextBox}}"
+				>
+
+			<Setter Property="Margin" Value="0,0,0,0" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="TextAlignment" Value="Right" />
+			<Setter Property="Width" Value="34" />
+		</Style>
+
+		<Style x:Key="TbxCvHex"
+				TargetType="TextBox"
+				BasedOn="{StaticResource TbxColorValue}"
+				>
+			<Setter Property="Padding" Value="0,6,0,8" />
+			<Setter Property="VerticalAlignment" Value="Bottom" />
+		</Style>
+
+		<Style x:Key="TbxCvByte"
+				TargetType="TextBox"
+				BasedOn="{StaticResource TbxColorValue}"
+				>
+			<Setter Property="Height" Value="52" />
+			<Setter Property="Padding" Value="0,14,1,18" />
+		</Style>
+
+		<Style x:Key="TbxCvDec"
+				TargetType="TextBox"
+				BasedOn="{StaticResource TbxCvByte}"
+				>
+
+		</Style>
+
+
+		<Style x:Key="BtnForeBack"
+				TargetType="Button"
+				BasedOn="{StaticResource {x:Type Button}}"
+				>
+			<Setter Property="Height" Value="26" />
+			<Setter Property="Padding" Value="5,2,5,4" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="FontSize" Value="10" />
+			<Setter Property="BorderBrush" Value="#444444" />
+			<Setter Property="BorderThickness" Value="0.5,0.5,0.5,1.5" />
+		</Style>
+
+		<Style x:Key="BtnUpDnArrow"
+				TargetType="Button"
+				BasedOn="{StaticResource {x:Type Button}}"
+				>
+
+			<Setter Property="Height" Value="14" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="0" />
+
+		</Style>
+
+		<Style x:Key="BtnUpArrow"
+				TargetType="Button"
+				BasedOn="{StaticResource BtnUpDnArrow}"
+				x:Shared="False"
+				>
+			<Setter Property="Padding" Value="0,3,0,0" />
+			<Setter Property="Margin" Value="2,0,2,-2" />
+			<Setter Property="VerticalContentAlignment" Value="Top" />
+			<Setter Property="Content" Value="{StaticResource IconChevronUp1}">
+
+			</Setter>
+		</Style>
+
+		<Style x:Key="BtnDnArrow"
+				TargetType="Button"
+				BasedOn="{StaticResource BtnUpDnArrow}"
+				x:Shared="False"
+				>
+			<Setter Property="Margin" Value="2,-2,2,0" />
+			<Setter Property="Padding" Value="0,0,0,3" />
+			<Setter Property="VerticalContentAlignment" Value="Bottom" />
+			<Setter Property="Content" Value="{StaticResource IconChevronDn1}" />
+		</Style>
+
+
+		<Style x:Key="BtnColorSel"
+				TargetType="ui:Button"
+				BasedOn="{StaticResource {x:Type Button}}"
+				x:Shared="False"
+				>
+			<Setter Property="Height" Value="15" />
+			<Setter Property="Width" Value="15" />
+			<Setter Property="CornerRadius" Value="3" />
+			<Setter Property="Padding" Value="2" />
+			<Setter Property="VerticalAlignment" Value="Bottom" />
+			<Setter Property="HorizontalAlignment" Value="left" />
+			<Setter Property="Content" Value="{StaticResource IconEyeDropper2}" />
+			<Setter Property="Cursor" Value="Hand" />
+		</Style>
+
+
+
+		<Style x:Key="DpColorNumbers"
+				TargetType="DockPanel"
+				>
+
+			<Setter Property="Margin" Value="0,0,0,0" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+
+		</Style>
+
+		<Style x:Key="GrdNumberButton"
+				TargetType="Grid"
+				>
+
+			<Setter Property="Margin" Value="0" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="VerticalAlignment" Value="Top" />
+		</Style>
+
+
+		<!--  <Style x:Key="BdrSampleLeft"  -->
+		<!--  TargetType="Border"  -->
+		<!--  >  -->
+		<!-- 	<Setter Property="HorizontalAlignment" Value="Right" /> -->
+		<!-- 	<Setter Property="BorderThickness" Value="1,1,0,1" /> -->
+		<!-- 	<Setter Property="BorderBrush" Value="LightGray" /> -->
+		<!-- 	<Setter Property="CornerRadius" Value="4,0,0,4" /> -->
+		<!-- </Style> -->
+
+		<Style x:Key="BdrSampleCenter"
+				TargetType="Border"
+				>
+			<Setter Property="CornerRadius" Value="4" />
+			<Setter Property="Margin" Value="2,0,2,0" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="BorderBrush" Value="LightGray" />
+			<!-- <Setter Property="Background" Value="{Binding  BkgBrushCenter, FallbackValue='Gray', TargetNullValue='lightgray'}" /> -->
+		</Style>
+
+		<!--  <Style x:Key="BdrSampleRight"  -->
+		<!--  TargetType="Border"  -->
+		<!--  >  -->
+		<!-- 	<Setter Property="Margin" Value="2,0,2,0" /> -->
+		<!-- 	<Setter Property="CornerRadius" Value="4" /> -->
+		<!-- 	<Setter Property="HorizontalAlignment" Value="Stretch" /> -->
+		<!-- 	<Setter Property="BorderThickness" Value="1,1,1,1" /> -->
+		<!-- 	<Setter Property="BorderBrush" Value="LightGray" /> -->
+		<!--  ~1~  <Setter Property="Background"  @1@  -->
+		<!--  ~1~  Value="{Binding BkgBrushRight, FallbackValue='DarkGray', TargetNullValue='lightgray'}"/>  @1@  -->
+		<!-- </Style> -->
+		<!--    -->
+		<!--    -->
+		<!--    -->
+		<!--  <Style x:Key="TblkSampleLeft"  -->
+		<!--  TargetType="TextBlock"  -->
+		<!--  >  -->
+		<!-- 	<Setter Property="Margin" Value="0,0,0,3" /> -->
+		<!-- 	<Setter Property="Padding" Value="0" /> -->
+		<!-- 	<Setter Property="HorizontalAlignment" Value="Center" /> -->
+		<!-- 	<Setter Property="VerticalAlignment" Value="Center" /> -->
+		<!-- 	<Setter Property="Background" Value="Transparent" /> -->
+		<!-- 	<Setter Property="FontSize" Value="14" /> -->
+		<!-- </Style> -->
+
+		<Style x:Key="TblkSampleCenter"
+				TargetType="TextBlock"
+				>
+			<Setter Property="Margin" Value="0,0,0,3" />
+			<Setter Property="Padding" Value="0" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+
+
+		<Style x:Key="TblkCaptionTitle"
+				TargetType="TextBlock"
+				>
+			<Setter Property="Margin" Value="0,0,0,10" />
+			<Setter Property="Padding" Value="0" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="VerticalAlignment" Value="Bottom" />
+		</Style>
+
+
+		<Style x:Key="RectVertColorBar"
+				TargetType="Rectangle"
+				>
+			<Setter Property="Width" Value="11" />
+			<Setter Property="HorizontalAlignment" Value="Center" />
+			<Setter Property="Margin" Value="0,-0.5,0,-0.5" />
+		</Style>
+
+		<Style x:Key="SliderThumb"
+				TargetType="Thumb"
+				>
+			<Setter Property="SnapsToDevicePixels" Value="true" />
+			<Setter Property="OverridesDefaultStyle" Value="true" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Thumb">
+
+						<Path x:Name="Path"
+								Data="F1 M 5.15625 14.589844 L 10 7.578125 L 14.853516 14.589844 L 10 21.582031 Z "
+								Stretch="Uniform"
+								RenderTransformOrigin="0.5,0.5"
+								>
+							<!--  Fill="{TemplateBinding Foreground}"  -->
+							<Path.Style>
+								<Style TargetType="Path">
+									<Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Foreground}" />
+									<Style.Triggers>
+										<DataTrigger Value="Vertical" Binding="{Binding Path=Orientation, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}">
+											<Setter Property="RenderTransform">
+												<Setter.Value>
+													<RotateTransform Angle="90" />
+												</Setter.Value>
+											</Setter>
+										</DataTrigger>
+										<Trigger Property="IsMouseOver" Value="true">
+											<Setter Property="Fill" Value="Blue" />
+										</Trigger>
+
+									</Style.Triggers>
+								</Style>
+							</Path.Style>
+						</Path>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsDragging" Value="true">
+								<Setter TargetName="Path" Property="Fill" Value="LightBlue">
+								</Setter>
+							</Trigger>
+						</ControlTemplate.Triggers>
+
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+
+		<Style x:Key="SliderStyleVertBase"
+				TargetType="{x:Type Slider}"
+				>
+			<Setter Property="Margin" Value="2,-7,-2,-7" />
+			<Setter Property="Width" Value="16" />
+			<Setter Property="Orientation" Value="Vertical" />
+			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="VerticalAlignment" Value="Stretch" />
+			<Setter Property="Foreground" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+		</Style>
+
+
+
+		<!--  <Style x:Key="SliderStyleHoriz"  -->
+		<!--  TargetType="{x:Type Slider}"  -->
+		<!--  >  -->
+		<!--    -->
+		<!-- 	<Setter Property="Template"> -->
+		<!-- 		<Setter.Value> -->
+		<!-- 			<ControlTemplate TargetType="{x:Type Slider}"> -->
+		<!-- 				<Grid VerticalAlignment="Center"> -->
+		<!--  <Border x:Name="borderBackground"  -->
+		<!--  Margin="6,0"  -->
+		<!--  Height="1"  -->
+		<!--  Background="Transparent"  -->
+		<!--  />  -->
+		<!--  <Canvas  -->
+		<!--  Margin="0,-4,0,0"  -->
+		<!--  VerticalAlignment="Center"  -->
+		<!--  >  -->
+		<!--  <Border x:Name="PART_SelectionRange"  -->
+		<!--  Height="1"  -->
+		<!--  HorizontalAlignment="Left"  -->
+		<!--  Background="Transparent"  -->
+		<!--  />  -->
+		<!-- 					</Canvas> -->
+		<!-- 					<Track x:Name="PART_Track"> -->
+		<!-- 						<Track.Thumb> -->
+		<!-- 							<Thumb Style="{StaticResource SliderThumb}" /> -->
+		<!-- 						</Track.Thumb> -->
+		<!-- 					</Track> -->
+		<!-- 				</Grid> -->
+		<!-- 			</ControlTemplate> -->
+		<!-- 		</Setter.Value> -->
+		<!-- 	</Setter> -->
+		<!-- 	<Setter Property="IsSelectionRangeEnabled" Value="True" /> -->
+		<!-- 	<Setter Property="SelectionStart" Value="{Binding Minimum, RelativeSource={RelativeSource Self}}" /> -->
+		<!-- 	<Setter Property="SelectionEnd" Value="{Binding Value, RelativeSource={RelativeSource Self}}" /> -->
+		<!--    -->
+		<!-- </Style> -->
+
+		<Style x:Key="SliderStyleVert"
+				TargetType="{x:Type Slider}"
+				BasedOn="{StaticResource SliderStyleVertBase}"
+				>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Slider}">
+						<Grid HorizontalAlignment="Center">
+							<Border x:Name="borderBackground"
+									Margin="0,6"
+									Width="1"
+									Background="Transparent"
+									/>
+							<Canvas
+									Margin="-4,0,0,0"
+									HorizontalAlignment="Center"
+									>
+								<Border x:Name="PART_SelectionRange"
+										Width="1"
+										VerticalAlignment="Stretch"
+										Background="Transparent"
+										/>
+							</Canvas>
+							<Track x:Name="PART_Track">
+								<Track.Thumb>
+									<Thumb
+											Tag="{Binding Path=Name,
+																		Mode=OneTime,
+																		RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+											Width="{Binding Path=Height,
+																			RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+											Height="{Binding Path=Width,
+																			 RelativeSource={RelativeSource AncestorType={x:Type Slider}}}"
+											DragStarted="Thumb_OnDragStarted"
+											DragCompleted="Thumb_OnDragCompleted"
+											Style="{StaticResource SliderThumb}"
+											/>
+									<!--  DragStarted="Thumb_OnDragStarted"  -->
+
+								</Track.Thumb>
+							</Track>
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+			<Setter Property="IsSelectionRangeEnabled" Value="True" />
+			<Setter Property="SelectionStart" Value="{Binding Minimum, RelativeSource={RelativeSource Self}}" />
+			<Setter Property="SelectionEnd" Value="{Binding Value, RelativeSource={RelativeSource Self}}" />
+
+		</Style>
+
+		<Style x:Key="SliderByte"
+				TargetType="Slider"
+				BasedOn="{StaticResource SliderStyleVert}"
+				>
+			<Setter Property="Minimum" Value="0" />
+			<Setter Property="Maximum" Value="255" />
+		</Style>
+
+		<Style x:Key="SliderByteRgb"
+				TargetType="Slider"
+				BasedOn="{StaticResource SliderByte}"
+				>
+			<Setter Property="Margin" Value="0,-7,0,-7" />
+		</Style>
+
+
+		<Style x:Key="SliderHslTo1"
+				TargetType="Slider"
+				BasedOn="{StaticResource SliderStyleVert}"
+				>
+			<Setter Property="Minimum" Value="0.0" />
+			<Setter Property="Maximum" Value="1.0" />
+		</Style>
+
+		<Style x:Key="SliderHslTo360"
+				TargetType="Slider"
+				BasedOn="{StaticResource SliderStyleVert}"
+				>
+			<Setter Property="Minimum" Value="0.0" />
+			<Setter Property="Maximum" Value="360.0" />
+		</Style>
+
+	</ui:FluentWindow.Resources>
+
+	<Grid Margin="15,0,15,10">
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="260" />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="34" />
+			<RowDefinition />
+
+		</Grid.RowDefinitions>
+
+		<ContentPresenter x:Name="RootContentDialog"
+				Grid.Row="1"
+				Margin="-10,9,0,-9"
+				Panel.ZIndex="3"
+				/>
+
+		<ui:TitleBar
+				Title="Color Chooser"
+				Grid.Row="0"
+				Grid.Column="0"
+				Grid.ColumnSpan="2"
+				Margin="-5,2,-20,-5"
+				Padding="0"
+				VerticalContentAlignment="Top"
+				Panel.ZIndex="2"
+				FontSize="14"
+				/>
+
+		<Grid
+				Grid.Row="1"
+				Grid.Column="0"
+				>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="20" />
+				<ColumnDefinition Width="200" />
+				<ColumnDefinition Width="30" />
+				<ColumnDefinition Width="10" />
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="44" />
+				<RowDefinition Height="100" />
+				<RowDefinition Height="100" />
+				<RowDefinition Height="16" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+
+			<StackPanel
+					Grid.Row="0"
+					Grid.Column="1"
+					Margin="0,0,0,10"
+					VerticalAlignment="Bottom"
+					Orientation="Vertical"
+					>
+
+				<ui:TextBlock
+						Margin="0,0,0,0"
+						Padding="0"
+						VerticalAlignment="Bottom"
+						FontTypography="Caption"
+						d:Foreground="white"
+						Text="Color"
+						/>
+
+				<ui:TextBlock
+						Margin="0,0,0,0"
+						Padding="0"
+						VerticalAlignment="Bottom"
+						FontTypography="Caption"
+						d:Foreground="white"
+						Text="Selection"
+						/>
+
+			</StackPanel>
+
+			<StackPanel x:Name="SpColorSelectBox"
+					Grid.Row="1"
+					Grid.Column="1"
+					Grid.RowSpan="2"
+					Orientation="Vertical"
+					MouseMove="SpColorSelectBox_OnMouseMove"
+					MouseDown="SpColorSelectBox_OnMouseDown"
+					>
+
+				<Grid Name="GrdColorChooserBox"
+						Margin="0,0,0,0"
+						Height="100"
+						VerticalAlignment="Top"
+						>
+
+					<Rectangle
+							StrokeThickness="0"
+							Fill="{StaticResource BrushColorPalette}"
+							/>
+
+					<Rectangle
+							StrokeThickness="0"
+							Fill="{StaticResource BrushWhiteOverlay}"
+							/>
+
+				</Grid>
+
+				<Grid Name="ColorPickerBox2"
+						Margin="0,0,0,0"
+						Height="100"
+						VerticalAlignment="Bottom"
+						>
+
+					<Rectangle
+							StrokeThickness="0"
+							Fill="{StaticResource BrushColorPalette}"
+							/>
+
+					<Rectangle
+							StrokeThickness="0"
+							Fill="{StaticResource BrushBlackOverlay}"
+							/>
+
+
+				</Grid>
+
+			</StackPanel>
+
+			<Grid
+					Grid.Row="4"
+					Grid.Column="0"
+					Grid.ColumnSpan="3"
+					Margin="5,3,10,0"
+					VerticalAlignment="Stretch"
+					>
+
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="2" />
+					<ColumnDefinition Width="30" />
+					<ColumnDefinition Width="30" />
+					<ColumnDefinition Width="38" />
+					<ColumnDefinition Width="38" />
+					<ColumnDefinition Width="30" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="15" />
+
+
+				</Grid.ColumnDefinitions>
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="20" />
+					<RowDefinition Height="18" />
+					<RowDefinition Height="18" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="*" />
+					<RowDefinition Height="18" />
+					<RowDefinition Height="42" />
+					<RowDefinition Height="42" />
+					<RowDefinition Height="2" />
+				</Grid.RowDefinitions>
+
+				<StackPanel x:Name="SpSmplLeft"
+						Grid.Row="1"
+						Grid.Column="1"
+						Grid.RowSpan="2"
+						Grid.ColumnSpan="3"
+						Margin="15,2,0,2"
+						Width="85"
+						Orientation="Horizontal"
+						>
+
+					<Border
+							Width="110"
+							Background="{Binding CurrBg}"
+							BorderThickness="1,1,1,1"
+							Style="{StaticResource BdrSampleCenter}"
+							>
+
+						<ui:TextBlock
+								Margin="10,0,0,0"
+								Padding="0,0,0,3"
+								HorizontalAlignment="Left"
+								Foreground="{Binding CurrFg,
+																		 FallbackValue='White'}"
+								Text="● Sample"
+								Style="{StaticResource TblkSampleCenter}"
+								/>
+
+					</Border>
+
+				</StackPanel>
+
+				<StackPanel x:Name="SpSmplRight"
+						Grid.Row="1"
+						Grid.Column="4"
+						Grid.RowSpan="2"
+						Grid.ColumnSpan="2"
+						Margin="0,2,-10,2"
+						Width="110"
+						HorizontalAlignment="Right"
+						Orientation="Horizontal"
+						>
+
+					<Border x:Name="BdrSampleMr"
+							Margin="0,0,0,0"
+							Width="110"
+							HorizontalAlignment="Right"
+							Background="{Binding SelBg.ToSolidColorBrush,
+																	 FallbackValue='DimGray'}"
+							BorderThickness="1,1,1,1"
+							Style="{StaticResource BdrSampleCenter}"
+							>
+
+						<ui:TextBlock
+								Margin="0,0,10,0"
+								Padding="0,0,0,3"
+								HorizontalAlignment="Right"
+								Foreground="{Binding SelFg.ToSolidColorBrush,
+																		 FallbackValue='white'}"
+								Text="Sample ●"
+								Style="{StaticResource TblkSampleCenter}"
+								/>
+
+					</Border>
+
+				</StackPanel>
+
+				<!--  foreground selected  -->
+				<Rectangle
+						Grid.Row="1"
+						Grid.Column="6"
+						Margin="0,0,8,0.5"
+						Width="16"
+						Height="16"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Bottom"
+						ToolTip="{Binding SelFgToolTip}"
+						Fill="{Binding SelFg.ToSolidColorBrush,
+													 FallbackValue='White'}"
+						MouseDown="SelFgRect_OnMouseDown"
+						/>
+
+				<!--  foreground selected  -->
+				<Rectangle
+						Grid.Row="2"
+						Grid.Column="6"
+						Margin="0,0.5,8,0"
+						Width="16"
+						Height="16"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Top"
+						ToolTip="{Binding SelBgToolTip}"
+						Fill="{Binding SelBg.ToSolidColorBrush,
+													 FallbackValue='DimGray'}"
+						MouseDown="SelBgRect_OnMouseDown"
+						/>
+
+
+				<ui:TextBlock x:Name="TblkCurr"
+						Grid.Row="6"
+						Grid.Column="1"
+						Grid.ColumnSpan="3"
+						Margin="0,2,8,2"
+						Padding="0"
+						HorizontalAlignment="Right"
+						VerticalAlignment="Center"
+						FontSize="10"
+						d:Foreground="White"
+						TextAlignment="Center"
+						Text="Current"
+						/>
+
+				<ui:TextBlock x:Name="TblkWrkg"
+						Grid.Row="6"
+						Grid.Column="4"
+						Grid.ColumnSpan="2"
+						Margin="8,2,0,2"
+						Padding="0"
+						HorizontalAlignment="left"
+						VerticalAlignment="Center"
+						FontSize="10"
+						d:Foreground="White"
+						TextAlignment="Center"
+						Text="Working"
+						/>
+
+				<ui:Button x:Name="FgColorSelect"
+						Grid.Row="7"
+						Grid.Column="5"
+						Margin="3,0,0,0"
+						d:Foreground="White"
+						Command="{Binding BtnFgEyeDrop_OnClickCommand}"
+						MouseEnter="ColorSelect_OnMouseEnter"
+						MouseLeave="ColorSelect_OnMouseLeave"
+						>
+					<ui:Button.Style>
+						<Style
+								TargetType="ui:Button"
+								BasedOn="{StaticResource BtnColorSel}"
+								>
+							<Setter Property="IsEnabled" Value="True" />
+							<Style.Triggers>
+								<DataTrigger Value="True" Binding="{Binding IsBgEyeDropActive}">
+									<Setter Property="IsEnabled" Value="False" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</ui:Button.Style>
+				</ui:Button>
+
+
+				<ui:Button x:Name="BtnFg"
+						Grid.Row="7"
+						Grid.Column="5"
+						Grid.ColumnSpan="3"
+						Content="Foreground"
+						Margin="8,0,8,2"
+						Width="66"
+						HorizontalAlignment="Right"
+						d:Foreground="white"
+						Command="{Binding SetForgroundCommand}"
+						>
+					<ui:Button.Style>
+						<Style
+								TargetType="Button"
+								BasedOn="{StaticResource BtnForeBack}"
+								>
+							<Style.Triggers>
+								<DataTrigger Value="true" Binding="{Binding IsForeground}">
+									<Setter Property="Foreground" Value="SkyBlue" />
+								</DataTrigger>
+
+							</Style.Triggers>
+						</Style>
+					</ui:Button.Style>
+
+				</ui:Button>
+
+				<ui:Button x:Name="BtnAplyFg"
+						Grid.Row="7"
+						Grid.Column="1"
+						Grid.ColumnSpan="2"
+						Content="Apply"
+						Margin="0,0,5,2"
+						Padding="12,2,12,3"
+						HorizontalAlignment="left"
+						d:Foreground="White"
+						Command="{Binding ApplyFgCommand}"
+						>
+					<!--  BorderBrush="#666666"  -->
+					<ui:Button.Style>
+						<Style
+								TargetType="Button"
+								BasedOn="{StaticResource BtnForeBack}"
+								>
+
+						</Style>
+					</ui:Button.Style>
+
+				</ui:Button>
+
+				<ui:Button x:Name="BgColorSelect"
+						Grid.Row="8"
+						Grid.Column="5"
+						Margin="3,0,0,6"
+						d:Foreground="White"
+						Command="{Binding BtnBgEyeDrop_OnClickCommand}"
+						MouseEnter="ColorSelect_OnMouseEnter"
+						MouseLeave="ColorSelect_OnMouseLeave"
+						>
+					<ui:Button.Style>
+						<Style
+								TargetType="ui:Button"
+								BasedOn="{StaticResource BtnColorSel}"
+								>
+							<Setter Property="IsEnabled" Value="True" />
+							<Style.Triggers>
+								<DataTrigger Value="True" Binding="{Binding IsFgEyeDropActive}">
+									<Setter Property="IsEnabled" Value="False" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</ui:Button.Style>
+				</ui:Button>
+
+
+				<ui:Button x:Name="BtnBg"
+						Grid.Row="8"
+						Grid.Column="5"
+						Grid.ColumnSpan="3"
+						Content="Background"
+						Margin="8,0,8,2"
+						Width="66"
+						HorizontalAlignment="Right"
+						d:Foreground="White"
+						Command="{Binding SetBackgroundCommand}"
+						>
+					<!--  BorderBrush="#666666"  -->
+					<ui:Button.Style>
+						<Style
+								TargetType="Button"
+								BasedOn="{StaticResource BtnForeBack}"
+								>
+							<Style.Triggers>
+								<DataTrigger Value="true" Binding="{Binding IsBackground}">
+									<Setter Property="Foreground" Value="SkyBlue">
+									</Setter>
+								</DataTrigger>
+								<!--  <Trigger Property="IsMouseOver"  -->
+								<!--  Value="True">  -->
+								<!--  <Setter Property="Background"  -->
+								<!--  Value="#333333"/>  -->
+								<!-- </Trigger> -->
+							</Style.Triggers>
+						</Style>
+					</ui:Button.Style>
+
+				</ui:Button>
+
+				<ui:Button x:Name="BtnAplyBg"
+						Grid.Row="8"
+						Grid.Column="1"
+						Grid.ColumnSpan="2"
+						Content="Apply"
+						Margin="0,2,5,0"
+						Height="26"
+						Padding="12,2,12,3"
+						HorizontalAlignment="left"
+						d:Foreground="White"
+						Command="{Binding ApplyBgCommand}"
+						>
+					<!--  BorderBrush="#666666"  -->
+					<ui:Button.Style>
+						<Style
+								TargetType="Button"
+								BasedOn="{StaticResource BtnForeBack}"
+								>
+							<!-- <Style.Triggers> -->
+							<!--  <Trigger Property="IsMouseOver"  -->
+							<!--  Value="True">  -->
+							<!--  <Setter Property="Background"  -->
+							<!--  Value="#333333"/>  -->
+							<!-- 	</Trigger> -->
+							<!-- </Style.Triggers> -->
+						</Style>
+					</ui:Button.Style>
+
+				</ui:Button>
+
+				<!--  foreground current  -->
+				<Rectangle
+						Grid.Row="7"
+						Grid.Column="3"
+						Margin="2,2,0,0"
+						Height="36"
+						VerticalAlignment="Bottom"
+						Fill="{Binding CurrFg,
+													 FallbackValue='White'}"
+						/>
+
+				<ui:TextBlock
+						Grid.Row="7"
+						Grid.Column="4"
+						Margin="0,4,2,0"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontSize="20"
+						FontFamily="Segoe UI Symbol"
+						d:Foreground="White"
+						Text="☻"
+						/>
+
+				<!--  foreground working  -->
+				<Rectangle
+						Grid.Row="7"
+						Grid.Column="4"
+						Margin="0,2,2,0"
+						Height="36"
+						VerticalAlignment="Bottom"
+						Fill="{Binding WkgFg,
+													 FallbackValue='DarkGray'}"
+						/>
+
+				<!--  background current  -->
+				<Rectangle
+						Grid.Row="8"
+						Grid.Column="3"
+						Margin="2,0,0,2"
+						Height="36"
+						VerticalAlignment="Top"
+						Fill="{Binding CurrBg,
+													 FallbackValue='Black'}"
+						/>
+
+				<ui:TextBlock
+						Grid.Row="8"
+						Grid.Column="4"
+						Margin="0,0,2,4"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontSize="20"
+						FontFamily="Segoe UI Symbol"
+						d:Foreground="White"
+						Text="☻"
+						/>
+
+				<!--  background working  -->
+				<Rectangle
+						Grid.Row="8"
+						Grid.Column="4"
+						Margin="0,0,2,2"
+						Height="36"
+						VerticalAlignment="Top"
+						Fill="{Binding WkgBg,
+													 FallbackValue='DimGray'}"
+						/>
+
+
+				<!-- removed
+				<ui:TextBox
+						Grid.Row="3"
+						Grid.Column="1"
+						Grid.ColumnSpan="3"
+						Margin="0,2,8,2"
+						Padding="0"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						VerticalContentAlignment="Center"
+						FontSize="12"
+						Height="26"
+						TextAlignment="Center"
+						Text="{Binding SelFg.ToHex,
+													 Mode=OneWay,
+													 FallbackValue='#FFFFFFFF'}"
+						/>
+
+				<ui:TextBox
+						Grid.Row="3"
+						Grid.Column="4"
+						Grid.ColumnSpan="3"
+						Margin="8,2,0,2"
+						Padding="0"
+						Height="26"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						VerticalContentAlignment="Center"
+						FontSize="10"
+						TextAlignment="Center"
+						Text="{Binding SelFg.ToDec,
+													 Mode=OneWay,
+													 FallbackValue='255, 255, 255, 255'}"
+						/>
+
+				<ui:TextBox
+						Grid.Row="4"
+						Grid.Column="1"
+						Grid.ColumnSpan="3"
+						Margin="0,2,8,2"
+						Padding="0"
+						Height="26"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						VerticalContentAlignment="Center"
+						FontSize="12"
+						TextAlignment="Center"
+						Text="{Binding SelBg.ToHex,
+													 Mode=OneWay,
+													 FallbackValue='#FFFFFFFF'}"
+						/>
+
+				<ui:TextBox
+						Grid.Row="4"
+						Grid.Column="4"
+						Grid.ColumnSpan="3"
+						Margin="8,2,0,2"
+						Padding="0"
+						Height="26"
+						HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						VerticalContentAlignment="Center"
+						FontSize="10"
+						TextAlignment="Center"
+						Text="{Binding SelBg.ToDec,
+													 Mode=OneWay,
+													 FallbackValue='255, 255, 255, 255'}"
+						/>
+				-->
+
+
+			</Grid>
+
+		</Grid>
+
+		<Grid
+				Grid.Row="1"
+				Grid.Column="1"
+				>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="18" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="10" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="12" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="12" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="26" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="6" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="6" />
+				<ColumnDefinition Width="34" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<Grid.RowDefinitions>
+				<RowDefinition Height="44" />
+				<RowDefinition Height="200" />
+				<RowDefinition Height="20" />
+				<RowDefinition Height="98" />
+				<RowDefinition Height="*" />
+				<RowDefinition Height="42" />
+				<RowDefinition Height="42" />
+				<RowDefinition Height="2" />
+			</Grid.RowDefinitions>
+
+
+			<ui:TextBox
+					Grid.Row="5"
+					Grid.Column="0"
+					Grid.ColumnSpan="3"
+					Margin="7,4,7,5"
+					Height="26"
+					Padding="0"
+					HorizontalAlignment="Stretch"
+					VerticalAlignment="Stretch"
+					VerticalContentAlignment="Center"
+					FontSize="12"
+					TextAlignment="Center"
+					Text="{Binding TmpFgHex,
+												 Mode=OneWay,
+												 FallbackValue='#FFFFFFFF'}"
+					/>
+
+			<ui:TextBox
+					Grid.Row="5"
+					Grid.Column="4"
+					Grid.ColumnSpan="5"
+					Margin="0,6,0,4"
+					Height="26"
+					Padding="0"
+					HorizontalAlignment="Stretch"
+					VerticalAlignment="Stretch"
+					VerticalContentAlignment="Center"
+					FontSize="12"
+					TextAlignment="Center"
+					Text="{Binding TmpFgDec,
+												 Mode=OneWay,
+												 FallbackValue='255, 255, 255, 255'}"
+					/>
+
+			<ui:TextBox
+					Grid.Row="6"
+					Grid.Column="0"
+					Grid.ColumnSpan="3"
+					Margin="7,4,7,3"
+					Height="26"
+					Padding="0"
+					HorizontalAlignment="Stretch"
+					VerticalAlignment="Stretch"
+					VerticalContentAlignment="Center"
+					FontSize="12"
+					TextAlignment="Center"
+					Text="{Binding TmpBgHex,
+												 Mode=OneWay,
+												 FallbackValue='#FFFFFFFF'}"
+					/>
+
+			<ui:TextBox
+					Grid.Row="6"
+					Grid.Column="4"
+					Grid.ColumnSpan="5"
+					Margin="0,4,0,4"
+					Height="26"
+					Padding="0"
+					HorizontalAlignment="Stretch"
+					VerticalAlignment="Stretch"
+					VerticalContentAlignment="Center"
+					FontSize="12"
+					TextAlignment="Center"
+					Text="{Binding TmpBgDec,
+												 Mode=OneWay,
+												 FallbackValue='255, 255, 255, 255'}"
+					/>
+
+
+			<!--  grey start  -->
+
+			<StackPanel
+					Grid.Row="0"
+					Grid.Column="0"
+					Margin="-0,0,0,10"
+					VerticalAlignment="Bottom"
+					>
+
+
+				<ui:TextBlock
+						Margin="0"
+						FontTypography="Caption"
+						d:Foreground="White"
+						Text="Grey"
+						Style="{StaticResource TblkCaptionTitle}"
+						/>
+
+				<!--  <ui:TextBlock  -->
+				<!--  Margin="0"  -->
+				<!--    -->
+				<!--  FontTypography="Caption"  -->
+				<!--  d:Foreground="White"  -->
+				<!--  Text="Selection"  -->
+				<!--    -->
+				<!--  Style="{StaticResource TblkCaptionTitle}"  -->
+				<!--  />  -->
+
+
+			</StackPanel>
+
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="0"
+					Width="26"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						Width="14"
+						Fill="{StaticResource BrushGraySelect}"
+						MouseMove="SpColorSelectBox_OnMouseMove"
+						MouseDown="OnColorGray_MouseDown"
+						Style="{StaticResource RectVertColorBar}"
+						/>
+
+				<Slider x:Name="GraySlider"
+						Value="{Binding TmpCx.GrayChangeB}"
+						d:Value="128"
+						d:Foreground="blue"
+						SmallChange="1"
+						LargeChange="10"
+						ValueChanged="OnValueChanged"
+						Style="{StaticResource SliderByte}"
+						/>
+
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="0"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							d:Foreground="White"
+							Text="{Binding ElementName=GraySlider,
+														 Path=Value,
+														 StringFormat={}{0:F0}}"
+							Style="{StaticResource TbxCvByte}"
+							>
+
+					</ui:TextBox>
+
+					<ui:Button
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=GraySlider}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=GraySlider}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<ui:TextBox
+						d:Foreground="White"
+						Text="{Binding ElementName=GraySlider,
+													 Path=Value,
+													 Converter={StaticResource DblToIntConverter},
+													 StringFormat={}{0:X}}"
+						Style="{StaticResource TbxCvHex}"
+						>
+					<i:Interaction.Behaviors>
+						<local:HexInputBehavior />
+					</i:Interaction.Behaviors>
+				</ui:TextBox>
+
+			</DockPanel>
+
+			<!--  grey select end  -->
+
+			<!--  alpha start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="2"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="Alpha"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="2"
+					Width="26"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						Grid.Row="0"
+						Grid.Column="0"
+						Width="14"
+						Fill="{StaticResource CheckerBrush}"
+						Style="{StaticResource RectVertColorBar}"
+						/>
+
+				<Rectangle
+						Width="14"
+						Fill="{StaticResource BrushAlphaSelect}"
+						Style="{StaticResource RectVertColorBar}"
+						/>
+
+				<Slider x:Name="AlphaSlide"
+						Value="{Binding TmpCx.AlphaB}"
+						d:Value="128"
+						d:Foreground="blue"
+						ValueChanged="OnValueChanged"
+						Style="{StaticResource SliderByte}"
+						/>
+
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="2"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							d:Foreground="White"
+							Text="{Binding ElementName=AlphaSlide,
+														 Path=Value,
+														 StringFormat={}{0:F0}}"
+							Style="{StaticResource TbxCvByte}"
+							/>
+
+					<ui:Button x:Name="BtnUpAlphaSlide"
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=AlphaSlide}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button x:Name="BtnDnAlphaSlide"
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=AlphaSlide}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<ui:TextBox
+						d:Foreground="White"
+						Text="{Binding ElementName=AlphaSlide,
+													 Path=Value,
+													 FallbackValue='FF',
+													 Converter={StaticResource DblToIntConverter},
+													 StringFormat={}{0:X2}}"
+						Style="{StaticResource TbxCvHex}"
+						/>
+
+			</DockPanel>
+
+			<!--  alpha end  -->
+
+			<!--  red start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="4"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="Red"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="4"
+					Width="28"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						HorizontalAlignment="left"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05" Color="#FFff0000" />
+							<GradientStop Offset="0.95" Color="#FF000000" />
+
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+				<Rectangle
+						HorizontalAlignment="Right"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05">
+								<GradientStop.Color>
+									<MultiBinding
+											FallbackValue="#FFFF8080"
+											Mode="OneWay"
+											Converter="{StaticResource ColorComponentsToColor}"
+											ConverterParameter="1"
+											>
+										<Binding
+												ElementName="AlphaSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="RedSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="GreenSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="BlueSlide"
+												Path="Value"
+												/>
+									</MultiBinding>
+								</GradientStop.Color>
+							</GradientStop>
+							<GradientStop Offset="0.95">
+								<GradientStop.Color>
+									<MultiBinding
+											FallbackValue="#FF008080"
+											Mode="OneWay"
+											Converter="{StaticResource ColorComponentsToColor}"
+											ConverterParameter="11"
+											>
+										<Binding
+												ElementName="AlphaSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="RedSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="GreenSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="BlueSlide"
+												Path="Value"
+												/>
+									</MultiBinding>
+								</GradientStop.Color>
+							</GradientStop>
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+
+				<Slider x:Name="RedSlide"
+						Tag="Red"
+						HorizontalAlignment="Center"
+						Value="{Binding TmpCx.RedB}"
+						d:Value="255"
+						d:Foreground="blue"
+						LargeChange="1"
+						ValueChanged="OnValueChanged"
+						Style="{StaticResource SliderByteRgb}"
+						/>
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="4"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							d:Foreground="White"
+							Text="{Binding ElementName=RedSlide,
+														 Path=Value,
+														 StringFormat={}{0:F0}}"
+							Style="{StaticResource TbxCvByte}"
+							/>
+
+					<ui:Button x:Name="BtnUpRedSlide"
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=RedSlide}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button x:Name="BtnDnRedSlide"
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=RedSlide}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<ui:TextBox
+						d:Foreground="White"
+						Text="{Binding ElementName=RedSlide,
+													 Path=Value,
+													 FallbackValue='FF',
+													 Converter={StaticResource DblToIntConverter},
+													 StringFormat={}{0:X2}}"
+						Style="{StaticResource TbxCvHex}"
+						/>
+
+			</DockPanel>
+
+			<!--  red end  -->
+
+
+			<!--  green start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="6"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="Green"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="6"
+					Width="28"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						HorizontalAlignment="left"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05" Color="#ff00FF00" />
+							<GradientStop Offset="0.95" Color="#FF000000" />
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+
+				<Rectangle
+						HorizontalAlignment="Right"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05">
+								<GradientStop.Color>
+									<MultiBinding
+											FallbackValue="#FF80FF80"
+											Mode="OneWay"
+											Converter="{StaticResource ColorComponentsToColor}"
+											ConverterParameter="2"
+											>
+										<Binding
+												ElementName="AlphaSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="RedSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="GreenSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="BlueSlide"
+												Path="Value"
+												/>
+									</MultiBinding>
+								</GradientStop.Color>
+							</GradientStop>
+							<GradientStop Offset="0.95">
+								<GradientStop.Color>
+									<MultiBinding
+											FallbackValue="#FF800080"
+											Mode="OneWay"
+											Converter="{StaticResource ColorComponentsToColor}"
+											ConverterParameter="12"
+											>
+										<Binding
+												ElementName="AlphaSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="RedSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="GreenSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="BlueSlide"
+												Path="Value"
+												/>
+									</MultiBinding>
+								</GradientStop.Color>
+							</GradientStop>
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+
+				<Slider x:Name="GreenSlide"
+						HorizontalAlignment="Center"
+						Value="{Binding TmpCx.GreenB,
+														FallbackValue=128}"
+						d:Value="128"
+						d:Foreground="blue"
+						ValueChanged="OnValueChanged"
+						Style="{StaticResource SliderByteRgb}"
+						/>
+
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="6"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							d:Foreground="White"
+							Text="{Binding ElementName=GreenSlide,
+														 Path=Value,
+														 StringFormat={}{0:F0}}"
+							Style="{StaticResource TbxCvByte}"
+							/>
+
+					<ui:Button
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=GreenSlide}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=GreenSlide}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<ui:TextBox
+						d:Foreground="White"
+						Text="{Binding ElementName=GreenSlide,
+													 Path=Value,
+													 FallbackValue='FF',
+													 Converter={StaticResource DblToIntConverter},
+													 StringFormat={}{0:X2}}"
+						Style="{StaticResource TbxCvHex}"
+						/>
+
+			</DockPanel>
+
+			<!--  green end  -->
+
+
+			<!--  blue start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="8"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="Blue"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="8"
+					Width="28"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						HorizontalAlignment="Left"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05" Color="#ff0000FF" />
+							<GradientStop Offset="0.95" Color="#FF000000" />
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+				<Rectangle
+						HorizontalAlignment="Right"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05">
+								<GradientStop.Color>
+									<MultiBinding
+											FallbackValue="#FF8080FF"
+											Mode="OneWay"
+											Converter="{StaticResource ColorComponentsToColor}"
+											ConverterParameter="3"
+											>
+										<Binding
+												ElementName="AlphaSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="RedSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="GreenSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="BlueSlide"
+												Path="Value"
+												/>
+									</MultiBinding>
+								</GradientStop.Color>
+							</GradientStop>
+							<GradientStop Offset="0.95">
+								<GradientStop.Color>
+									<MultiBinding
+											FallbackValue="#FF808000"
+											Mode="OneWay"
+											Converter="{StaticResource ColorComponentsToColor}"
+											ConverterParameter="13"
+											>
+										<Binding
+												ElementName="AlphaSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="RedSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="GreenSlide"
+												Path="Value"
+												/>
+										<Binding
+												ElementName="BlueSlide"
+												Path="Value"
+												/>
+									</MultiBinding>
+								</GradientStop.Color>
+							</GradientStop>
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+
+				<Slider x:Name="BlueSlide"
+						HorizontalAlignment="Center"
+						Value="{Binding TmpCx.BlueB,
+														FallbackValue=128}"
+						d:Value="128"
+						d:Foreground="blue"
+						ValueChanged="OnValueChanged"
+						Style="{StaticResource SliderByteRgb}"
+						/>
+
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="8"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							d:Foreground="White"
+							Text="{Binding ElementName=BlueSlide,
+														 Path=Value,
+														 StringFormat={}{0:F0}}"
+							Style="{StaticResource TbxCvByte}"
+							/>
+
+					<ui:Button x:Name="BtnUpBlueSlide"
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=BlueSlide}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button x:Name="BtnDnBlueSlide"
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=BlueSlide}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<ui:TextBox
+						d:Foreground="White"
+						Text="{Binding ElementName=BlueSlide,
+													 Path=Value,
+													 FallbackValue='FF',
+													 Converter={StaticResource DblToIntConverter},
+													 StringFormat={}{0:X2}}"
+						Style="{StaticResource TbxCvHex}"
+						/>
+
+			</DockPanel>
+
+			<!--  blue end  -->
+
+
+
+			<!--  red start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="10"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="H"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="10"
+					Width="26"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						Width="14"
+						Fill="{StaticResource BrushHueSelectVertical}"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<!-- <Rectangle.Fill> -->
+					<!-- 	<LinearGradientBrush StartPoint="0,0" EndPoint="0,1"> -->
+					<!-- 		<GradientStop Offset="0.05" Color="#ffFF0000" /> -->
+					<!-- 		<GradientStop Offset="0.95" Color="#FF000000" /> -->
+					<!-- 	</LinearGradientBrush> -->
+					<!-- </Rectangle.Fill> -->
+				</Rectangle>
+
+
+				<Slider x:Name="HueSlider"
+						Value="{Binding HueValue,
+														FallbackValue=300}"
+						d:Value="300"
+						d:Foreground="blue"
+						Style="{StaticResource SliderHslTo360}"
+						/>
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="10"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							FontSize="12"
+							d:Foreground="White"
+							Text="{Binding ElementName=HueSlider,
+														 Path=Value,
+														 StringFormat={}{0:F1}}"
+							Style="{StaticResource TbxCvDec}"
+							/>
+
+					<ui:Button
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=HueSlider}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=HueSlider}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<!--  <ui:TextBox  -->
+				<!--  d:Foreground="White"  -->
+				<!--  Text="ff"  -->
+				<!--  Style="{StaticResource TbxCvHex}"  -->
+				<!--  />  -->
+
+			</DockPanel>
+
+			<!--  red end  -->
+
+
+			<!--  green start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="12"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="S"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="12"
+					Width="26"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						Width="14"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05" Color="{Binding SatOne.ColorValue, FallbackValue=#FFFF0000}" />
+							<GradientStop Offset="0.95" Color="{Binding SatZero.ColorValue, FallbackValue=#FF808080}" />
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+
+				<Slider x:Name="SaturationSlider"
+						Value="{Binding SaturationValue}"
+						d:Value="0.5"
+						d:Foreground="blue"
+						Style="{StaticResource SliderHslTo1}"
+						/>
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="12"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							Margin="-2,0,-3,0"
+							FontSize="12"
+							d:Foreground="White"
+							Text="{Binding ElementName=SaturationSlider,
+														 Path=Value,
+														 StringFormat={}{0:F3}}"
+							Style="{StaticResource TbxCvDec}"
+							/>
+
+					<ui:Button
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=SaturationSlider}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=SaturationSlider}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<!--  <ui:TextBox  -->
+				<!--  d:Foreground="White"  -->
+				<!--  Text="ff"  -->
+				<!--  Style="{StaticResource TbxCvHex}"  -->
+				<!--  />  -->
+
+			</DockPanel>
+
+			<!--  green end  -->
+
+
+			<!--  blue start  -->
+
+			<ui:TextBlock
+					Grid.Row="0"
+					Grid.Column="14"
+					FontTypography="Caption"
+					d:Foreground="White"
+					Text="L"
+					Style="{StaticResource TblkCaptionTitle}"
+					/>
+
+			<Grid
+					Grid.Row="1"
+					Grid.Column="14"
+					Width="26"
+					HorizontalAlignment="Center"
+					>
+
+				<Rectangle
+						Width="14"
+						Style="{StaticResource RectVertColorBar}"
+						>
+					<Rectangle.Fill>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Offset="0.05" Color="{Binding LightOne.ColorValue, FallbackValue=#FFffffff}" />
+							<GradientStop Offset="0.50" Color="{Binding LightHalf.ColorValue, FallbackValue=#FFFF0000}" />
+							<GradientStop Offset="0.95" Color="{Binding LighZero.ColorValue, FallbackValue=#FF000000}" />
+						</LinearGradientBrush>
+					</Rectangle.Fill>
+				</Rectangle>
+
+
+				<Slider x:Name="LightnessSlider"
+						Value="{Binding LightnessValue}"
+						d:Value="0.5"
+						d:Foreground="blue"
+						Style="{StaticResource SliderHslTo1}"
+						/>
+
+			</Grid>
+
+			<DockPanel
+					Grid.Row="3"
+					Grid.Column="14"
+					Style="{StaticResource DpColorNumbers}"
+					>
+
+				<Grid
+						DockPanel.Dock="Top"
+						Style="{StaticResource GrdNumberButton}"
+						>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="{StaticResource GlUpArrow}" />
+						<RowDefinition Height="{StaticResource GlTbxCvDec}" />
+						<RowDefinition Height="{StaticResource GlDnArrow}" />
+					</Grid.RowDefinitions>
+
+					<ui:TextBox
+							Grid.Row="0"
+							Grid.Column="0"
+							Grid.RowSpan="3"
+							Margin="-2,0,-3,0"
+							FontSize="12"
+							d:Foreground="White"
+							Text="{Binding ElementName=LightnessSlider,
+														 Path=Value,
+														 StringFormat={}{0:F3}}"
+							Style="{StaticResource TbxCvDec}"
+							/>
+
+					<ui:Button
+							Grid.Row="0"
+							Grid.Column="0"
+							Command="{x:Static Slider.IncreaseLarge}"
+							CommandTarget="{Binding ElementName=LightnessSlider}"
+							Style="{StaticResource BtnUpArrow}"
+							/>
+
+					<ui:Button
+							Grid.Row="2"
+							Grid.Column="0"
+							Command="{x:Static Slider.DecreaseLarge}"
+							CommandTarget="{Binding ElementName=LightnessSlider}"
+							Style="{StaticResource BtnDnArrow}"
+							/>
+
+				</Grid>
+
+				<!--  <ui:TextBox  -->
+				<!--  d:Foreground="White"  -->
+				<!--  Text="ff"  -->
+				<!--  Style="{StaticResource TbxCvHex}"  -->
+				<!--  />  -->
+
+			</DockPanel>
+
+			<!--  blue end  -->
+
+			<ui:Button
+					Grid.Row="5"
+					Grid.Column="12"
+					Grid.RowSpan="2"
+					Grid.ColumnSpan="3"
+					Content="Done"
+					Margin="0,2,0,6"
+					Height="32"
+					Padding="0,0,0,0"
+					HorizontalAlignment="Stretch"
+					VerticalAlignment="Bottom"
+					FontSize="16"
+					d:Foreground="White"
+					Click="Done_OnClick"
+					/>
+
+		</Grid>
+
+	</Grid>
+
+</ui:FluentWindow>
+
+
+
+<!--  saved as this has the horizontal slider  -->
+<!--    -->
+<!--  <Grid  -->
+<!--  Grid.Row="3"  -->
+<!--  Grid.Column="1"  -->
+<!--  Margin="0,12,0,5"  -->
+<!--  Height="21"  -->
+<!--  VerticalAlignment="Top"  -->
+<!--  >  -->
+<!--    -->
+<!--  <Rectangle  -->
+<!--  Height="14"  -->
+<!--  VerticalAlignment="Top"  -->
+<!--  Fill="{StaticResource CheckerBrush}"  -->
+<!--  />  -->
+<!--    -->
+<!--  <Rectangle  -->
+<!--  Height="14"  -->
+<!--  VerticalAlignment="Top"  -->
+<!--  Fill="{StaticResource BrushAlphaSelect}"  -->
+<!--  />  -->
+<!--    -->
+<!--  <Slider  -->
+<!--  Margin="-7,0,-7,0"  -->
+<!--  Height="12"  -->
+<!--  VerticalAlignment="Bottom"  -->
+<!--  Foreground="{DynamicResource AccentFillColorDefaultBrush}"  -->
+<!--  d:Foreground="blue"  -->
+<!--  Orientation="Horizontal"  -->
+<!--  Style="{StaticResource SliderStyleHoriz}"  -->
+<!--  >  -->
+<!-- 	</Slider> -->
+<!--    -->
+<!-- </Grid> -->
+<!--    -->
+
+
